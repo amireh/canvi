@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta encoding="utf-8" />
+    <script src="../vendor/js/jquery-1.9.1.js"></script>
+  </head>
+  <body>
+    <button id="buttonTester">Push me</button>
+
+    <script>
+      document.getElementById('buttonTester').addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        e.cancel = e.cancelBubble = true;
+        e.stopImmediatePropagation();
+        console.log('#buttonTester clicked');
+
+        return false;
+      }, false);
+    </script>
+  </body>
+</html>
