@@ -1,10 +1,14 @@
-var port = chrome.extension.connect({
-  name: 'Canvi Panel'
-});
-var appId = chrome.devtools.inspectedWindow.tabId;
+(function() {
+  'use strict';
 
-port.postMessage({ appId: appId });
+  var port = chrome.extension.connect({
+    name: 'Canvi Panel'
+  });
+  var appId = chrome.devtools.inspectedWindow.tabId;
 
-port.onMessage.addListener(function(message) {
-  console.info('[canvi] panel got a message:', message);
-});
+  port.postMessage({ appId: appId });
+
+  port.onMessage.addListener(function(message) {
+    console.info('[canvi] panel got a message:', message);
+  });
+})();

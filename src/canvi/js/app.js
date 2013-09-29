@@ -1,4 +1,6 @@
-(function() {
+define('app', [ 'jquery' ], function($) {
+  'use strict';
+
   console.log('[Canvi] hi!');
 
   document.addEventListener('click', function(e) {
@@ -22,4 +24,4 @@
     // });
     // window.postMessage({ type: "FROM_PAGE", text: "Hello from the webpage!" }, "*");
   }, true);
-})();
+});

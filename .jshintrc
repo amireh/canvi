@@ -70,6 +70,7 @@
   "onevar"        : false,
   "passfail"      : false,
   "white"         : false,
+  "evil": true,
 
   "globals" : {
     "it"          : false,
@@ -84,6 +85,7 @@
     "jQuery"      : false,
     "$"           : false,
     "define": false,
-    "i18n": false
+    "i18n": false,
+    "chrome": false
   }
 }

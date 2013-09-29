@@ -18,6 +18,7 @@ module.exports = function(grunt) {
     jshint: {
       all: jsSources,
       options: {
+        ignores: [ 'src/canvi/js/main.js' ],
         jshintrc: '.jshintrc'
       }
     },
@@ -78,14 +79,15 @@ module.exports = function(grunt) {
     requirejs: {
       compile: {
         options: {
-          appDir: 'src/canvi/js',
+          baseUrl: 'src/canvi/js',
           out: 'dist/canvi.min.js',
-          mainConfigFile: './main.js',
-          optimize: 'uglify',
+          mainConfigFile: 'src/canvi/js/main.js',
+          optimize: 'none',
 
-          removeCombined:           true,
+          removeCombined:           false,
           inlineText:               true,
           preserveLicenseComments:  false,
+          skipModuleInsertion: false,
 
           uglify: {
             toplevel:         true,
@@ -104,13 +106,8 @@ module.exports = function(grunt) {
           pragmas: {
             production: true
           },
-
-          modules: [
-            {
-              name: "main",
-              include: [ 'main' ]
-            }
-          ]
+          name: "main",
+          include: [ "requireLib" ]
         }
       }
     },
@@ -158,8 +155,6 @@ module.exports = function(grunt) {
           'categories': '.jsduck',
           'builtin-classes': false,
           'color': true,
-          'guides': 'doc/guides.json',
-          'images': 'doc/images',
           'warnings': [],
           'external': [
           ]
