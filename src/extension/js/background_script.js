@@ -1,48 +1,63 @@
 (function() {
   'use strict';
 
-  // Messages coming in from the content script:
-  chrome.extension.onMessage.addListener(function(request, sender) {
-    var port = ports[sender.tab.id];
-
-    console.log('[canvi.bs]: chrome extension got a message:', arguments);
-
-    if (port) {
-      console.log('[canvi.bs]:\tforwarding to port:', port);
-      port.postMessage(request);
-    }
-  });
-
   var ports = {};
+
 
   // Messages coming in from the panel:
   chrome.extension.onConnect.addListener(function(port) {
-    var appId;
+    var tabId;
+    var panelId = port.portId_;
 
-    console.log('[canvi.bs]: a panel port has been opened:', port);
+    if (port.name !== 'Canvi Panel') {
+      return;
+    }
+
+    console.log('panel registered:', panelId);
 
     port.onMessage.addListener(function(message) {
-      console.log('[canvi.bs]: port', port.portId_, 'sent a message:', message);
-
-      if (message.appId) {
-        appId = message.appId;
-
-        ports[appId] = port;
+      if (tabId) {
+        console.log('panel', panelId, 'to canvi', tabId, message);
+        chrome.tabs.sendMessage(tabId, message);
+      }
+      else if (message.tabId) {
+        tabId = message.tabId;
+        ports[tabId] = port;
 
         port.onDisconnect.addListener(function() {
-          delete ports[appId];
+          delete ports[tabId];
         });
 
-        console.log('got the tab id:', appId);
+        console.log('panel', panelId, 'is attached to canvi instance', tabId);
       }
-      // else if (message.from === 'devtools') {
       else {
-        console.log('dispatching to tab:', appId);
-        chrome.tabs.sendMessage(appId, message);
+        console.warn('got a message, but no tabId, can do nothing.');
       }
     });
+
   });
 
-  console.log('[canvi] background page accepting messages..');
+  // Forward messages coming in from Canvi to the Panel:
+  chrome.extension.onMessage.addListener(function(message, canvi) {
+    var idPanel;
+    var idCanvi = canvi.tab.id;
+    var panelPort = ports[idCanvi];
 
+    if (panelPort) {
+      idPanel = panelPort.portId_;
+      console.log('canvi', idCanvi, 'to panel', idPanel, message);
+      panelPort.postMessage(message);
+    }
+    else {
+      console.error('unknown canvi instance:', idCanvi);
+    }
+  });
+
+  window.notifyPanels = function(msg) {
+    Object.keys(ports).forEach(function(portId_) {
+      ports[portId_].postMessage(msg);
+    });
+  };
+
+  console.log('ready to establish links between canvi and panel instances');
 })();

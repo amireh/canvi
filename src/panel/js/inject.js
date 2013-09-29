@@ -1,7 +1,6 @@
 (function() {
   'use strict';
 
-  console.log('test');
   var runScript = function(path) {
     var xhr;
 
@@ -10,7 +9,7 @@
     xhr.send();
     chrome.devtools.inspectedWindow.eval(xhr.responseText);
 
-    console.log('got script:', path);
+    // console.debug('got script:', path);
   };
 
   /**
@@ -35,7 +34,7 @@
       location.reload(true);
     });
 
-    injectCanvi();
+    // injectCanvi();
   }
 
 })();

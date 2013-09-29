@@ -174,7 +174,7 @@ module.exports = function(grunt) {
         tasks: [ /*'jshint', */'requirejs', 'notify:requirejs' ]
       },
       css: {
-        files: 'src/**/*.less',
+        files: [ 'src/**/*.less', 'assets/fonts/**/*.less' ],
         tasks: [ 'less', 'notify:less' ]
       },
       docs: {

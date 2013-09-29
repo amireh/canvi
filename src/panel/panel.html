@@ -13,24 +13,32 @@
 
     <!-- The Panel App -->
     <script src="js/namespace.js"></script>
+    <script src="js/ext/zepto.js"></script>
     <script src="js/core/util.js"></script>
     <script src="js/core/port.js"></script>
     <script src="js/core/router.js"></script>
     <script src="js/views/macros.js"></script>
 
     <!-- Canvi client injector
-    -->
     <script src="js/inject.js"></script>
-
+    -->
   </head>
 
   <body>
-    <aside>
-      <nav>
-        <a class="link-button" href="/macros">Macros</a>
-        <a class="link-button" href="/insights">Insights</a>
-      </nav>
-    </aside>
+    <nav>
+      <ul>
+        <li>
+          <a href="/macros">
+            <i class="icon-cmd icon-red"></i> Macros
+          </a>
+        </li>
+        <li>
+          <a href="/insights">
+            <i class="icon-light-bulb icon-purple"></i> Insights
+          </a>
+        </li>
+      </ul>
+    </nav>
 
     <div id="content"></div>
 

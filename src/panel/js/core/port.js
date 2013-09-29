@@ -36,7 +36,7 @@
         })
       });
 
-      this.get('chromePort').postMessage({ appId: this.get('id') });
+      this.get('chromePort').postMessage({ tabId: this.get('id') });
       this.get('chromePort').onMessage.addListener(_.bind(this.broadcast, this));
     },
 
@@ -50,6 +50,10 @@
     broadcast: function(message) {
       console.log('got a message:', message);
 
+      if (message === 'reload') {
+        window.location.reload(true);
+      }
+
       this.trigger([ message.category, message.label ].join(':'), message.data);
     },
 
@@ -61,6 +65,8 @@
      * @param {Object} [data={}]  Any specific message data.
      */
     toCanvi: function(category, label, data) {
+      console.debug('to canvi:', [ category, label ].join(':'));
+
       this.get('chromePort').postMessage({
         category: category,
         label: label,
@@ -70,6 +76,6 @@
     }
   });
 
-  Panel.Port  = new Port();
+  Panel.Port = new Port();
   Panel.Port.connect();
 })();

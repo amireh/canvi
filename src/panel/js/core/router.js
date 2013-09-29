@@ -28,6 +28,9 @@
       try {
         console.debug('router: navigating to:', url);
         Backbone.history.navigate(url, { silent: false, trigger: true });
+
+        $('nav .selected').removeClass('selected');
+        $('nav [href*="' + url + '"]').parent().addClass('selected');
       } finally {
         // Not doing this will leave the panel in a broken state where the
         // URL doesn't map to any HTML file, so we must restore to the "index"

@@ -6,9 +6,9 @@
   console.log('[Canvi] injecting content-script...');
 
   window.addEventListener('message', function(message) {
-    console.debug('[canvi cs] got a window message:', message);
 
     if (message.data === 'register-canvi') {
+      console.debug('[canvi cs] canvi is being registered:', message);
       var port = message.ports[0];
       listenToPort(port);
     }
@@ -20,6 +20,7 @@
 
   function listenToPort(port) {
     port.addEventListener('message', function(event) {
+      console.warn('forwarding to extension');
       chrome.extension.sendMessage(event.data);
     });
 
@@ -27,7 +28,7 @@
       console.debug('got a message from panel:', message);
 
       if (message.from === 'panel') {
-        console.debug('[cs]\tforwarding to port');
+        // console.debug('[cs]\tforwarding to port');
         port.postMessage(message);
       }
     });

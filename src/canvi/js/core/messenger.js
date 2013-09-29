@@ -21,11 +21,20 @@ define('core/messenger', [ 'backbone' ], function(Backbone) {
       });
 
       // Ping the content-script so it can open a port to the panel.
-      window.postMessage('register-canvi', [ this.get('proxyPort') ], '*');
+      // window.postMessage('register-canvi', [ this.get('proxyPort') ], '*');
 
       // Accept messages from the Panel.
-      this.get('panelPort').addEventListener('message', _.bind(this.broadcast, this));
+      // this.get('panelPort').addEventListener('message', _.bind(this.broadcast, this));
+      // this.get('panelPort').start();
+
+      // console.log(this.get('channel'));
+      chrome.extension.onMessage.addListener(_.bind(this.broadcast, this));
+
       this.get('panelPort').start();
+
+      var port = chrome.runtime.connect();
+      console.log(chrome.extension);
+      console.debug('port open');
     },
 
     /**
@@ -33,7 +42,7 @@ define('core/messenger', [ 'backbone' ], function(Backbone) {
      * @private
      */
     broadcast: function(event) {
-      var message = event.data;
+      var message = event;
       var valid = true;
 
       if (message.from !== 'panel') {
@@ -65,12 +74,18 @@ define('core/messenger', [ 'backbone' ], function(Backbone) {
      * Any data to be attached to the message.
      */
     toPanel: function(category, label, payload) {
-      window.postMessage({
+      chrome.extension.sendMessage({
         from: 'canvi',
         category: category,
         label: label,
         data: payload
-      }, '*');
+      });
+      // window.postMessage({
+      //   from: 'canvi',
+      //   category: category,
+      //   label: label,
+      //   data: payload
+      // }, '*');
     }
   });
 });

@@ -5,7 +5,8 @@ requirejs.config({
     'jquery': '../../../vendor/js/zepto-1.0',
     'requireLib': '../../../vendor/js/require',
     'backbone': '../../../vendor/js/backbone-1.0.0',
-    'lodash': '../../../vendor/js/lodash.custom'
+    'lodash': '../../../vendor/js/lodash.custom',
+    'store': '../../../vendor/js/store.min'
   },
 
   shim: {
@@ -15,7 +16,8 @@ requirejs.config({
       exports: 'Backbone'
     },
     'lodash': { exports: '_' },
-    'inflection': {}
+    'inflection': {},
+    'store': { exports: 'store' }
   },
 
   hbs: {
