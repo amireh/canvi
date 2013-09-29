@@ -22,8 +22,7 @@
     chrome.devtools.inspectedWindow.eval(
       'window.requirejs.config({' +
         'baseUrl: "' + chrome.extension.getURL('/src/canvi/js') + '"' +
-      '});',
-      function(result, isException) {}
+      '});'
     );
   }
 

@@ -86,6 +86,7 @@
     "$"           : false,
     "define": false,
     "chrome": false,
-    "Backbone": false
+    "Backbone": false,
+    "Canvi": false
   }
 }

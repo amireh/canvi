@@ -5,5 +5,5 @@ define('core/messenger', [ ], function() {
     sendToPanel: function(payload) {
       window.postMessage(payload, '*');
     }
-  }
+  };
 });
