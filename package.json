@@ -1,7 +1,7 @@
 {
   "name": "Canvi",
   "description": "Task automation for Instructure Canvas development.",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "homepage": "https://github.com/amireh/canvi",
   "private": true,
   "author": {
@@ -9,7 +9,9 @@
     "email": "ahmad@instructure.com",
     "url": "http://www.algollabs.com"
   },
-  "licenses": [ "MIT" ],
+  "licenses": [
+    "MIT"
+  ],
   "keywords": [
     "instructure",
     "canvas",
