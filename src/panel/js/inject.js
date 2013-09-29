@@ -1,6 +1,7 @@
 (function() {
   'use strict';
 
+  console.log('test');
   var runScript = function(path) {
     var xhr;
 
@@ -8,6 +9,8 @@
     xhr.open('GET', chrome.extension.getURL(path), false);
     xhr.send();
     chrome.devtools.inspectedWindow.eval(xhr.responseText);
+
+    console.log('got script:', path);
   };
 
   /**
@@ -15,7 +18,6 @@
    */
   function injectCanvi() {
     runScript('/vendor/js/require.js');
-    runScript('/src/canvi/js/main.js');
 
     // We'll do this for development so we won't have to recompile the JS
     // everytime we do a change.
@@ -24,6 +26,8 @@
         'baseUrl: "' + chrome.extension.getURL('/src/canvi/js') + '"' +
       '});'
     );
+
+    runScript('/src/canvi/js/main.js');
   }
 
   if (typeof chrome !== 'undefined' && chrome.devtools) {

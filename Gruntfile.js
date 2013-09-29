@@ -171,15 +171,34 @@ module.exports = function(grunt) {
       },
       scripts: {
         files: jsSources,
-        tasks: [ /*'jshint', */'requirejs', 'docs' ]
+        tasks: [ /*'jshint', */'requirejs', 'notify:requirejs' ]
       },
       css: {
         files: 'src/**/*.less',
-        tasks: [ 'less', 'notify:less', 'notify' ]
+        tasks: [ 'less', 'notify:less' ]
       },
       docs: {
         files: [ '.jsduck', 'doc/guides/**/*.md', 'doc/*.*' ],
-        tasks: [ 'docs', 'notify:docs', 'notify' ]
+        tasks: [ 'docs', 'notify:docs' ]
+      }
+    },
+
+    notify: {
+      requirejs: {
+        options: {
+          title: 'Task Complete',  // optional
+          message: 'Canvi JS has been compiled.', //required
+        }
+      },
+      less: {
+        options: {
+          message: 'Canvi CSS has been compiled.'
+        }
+      },
+      docs: {
+        options: {
+          message: 'Canvi API docs have been generated.'
+        }
       }
     },
 
@@ -214,6 +233,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-jsduck');
   grunt.loadNpmTasks('grunt-notify');
   grunt.loadNpmTasks('grunt-string-replace');
+  // grunt.task_run('notify_hooks');
 
   grunt.registerTask('updatePkg', function () {
     grunt.config.set('pkg', readPkg());
@@ -230,21 +250,21 @@ module.exports = function(grunt) {
   grunt.registerTask('default', [ 'test' ]);
   grunt.registerTask('version', [ 'string-replace:version' ]);
 
-  grunt.registerTask('notify', function(target) {
-    var message;
+  // grunt.registerTask('notify', function(target) {
+  //   var message;
 
-    switch( target ) {
-      case 'less':
-        message = 'Canvi LESS finished compiling.';
-      break;
-      case 'docs':
-        message = 'Canvi API docs have been generated.';
-      break;
+  //   switch( target ) {
+  //     case 'less':
+  //       message = 'Canvi LESS finished compiling.';
+  //     break;
+  //     case 'docs':
+  //       message = 'Canvi API docs have been generated.';
+  //     break;
 
-    }
+  //   }
 
-    grunt.config.set('notify.options.message', message);
-  });
+  //   grunt.config.set('notify.options.message', message);
+  // });
 
   // Release alias task
   grunt.registerTask('release', function (type) {

@@ -16,8 +16,11 @@
 
   "content_scripts": [{
     "matches": ["<all_urls>"],
-    "js": [ "src/extension/js/content_script.js" ],
-    "run_at": "document_end"
+    "js": [
+      "src/extension/js/content_script.js",
+      "dist/canvi.min.js"
+    ],
+    "run_at": "document_start"
   }],
 
   "permissions": [ "<all_urls>" ],

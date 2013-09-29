@@ -6,8 +6,9 @@ define('app', [
 
   console.log('[Canvi] hi!');
 
-  Canvi.Messenger = Messenger;
+  Canvi.Messenger = new Messenger();
   Canvi.MacroManager = new MacroManager();
 
-  Canvi.MacroManager.start();
+  Canvi.Messenger.connect();
+  // Canvi.MacroManager.start();
 });

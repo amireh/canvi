@@ -55,4 +55,6 @@ var proxyConsole = function() {
   root.Panel.Storage = window.store;
 
   proxyConsole();
+
+  console.log('Canvi Panel namespaced defined.')
 })();

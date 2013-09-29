@@ -7,7 +7,11 @@
 
   Panel.MacrosView = Backbone.View.extend({
     messages: {
-      'macroEvent': 'appendMacroEntry'
+      'macros:entry': 'appendMacroEntry'
+    },
+
+    events: {
+      'click [data-action="record"]': 'proxyRecord'
     },
 
     bind: function() {
@@ -23,7 +27,7 @@
         this.remove();
       }
 
-      this.$el = $( jstIndex({}) );
+      this.setElement( jstIndex({}) );
       this.bind();
 
       $('#content').html( this.$el );
@@ -34,6 +38,10 @@
 
       // $('body').append('<li>' + JSON.stringify(message) + '</li>');
       this.$('#macro_listing').append(jstEntry(message));
+    },
+
+    proxyRecord: function() {
+      Panel.Port.toCanvi('macros', 'record');
     }
   });
 

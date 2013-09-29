@@ -2,12 +2,14 @@
 <html>
   <head>
     <meta encoding="utf-8" />
-    <script xsrc="../dist/canvi.min.js"></script>
   </head>
   <body>
     <button id="buttonTester">Push me</button>
 
     <script>
+    console.warn('[script] installing my local handlers');
+    setTimeout(function() {
+
       document.getElementById('buttonTester').addEventListener('click', function(e) {
         e.preventDefault();
         e.stopPropagation();
@@ -16,7 +18,21 @@
         console.log('#buttonTester clicked');
 
         return false;
-      }, false);
-    </script>
+      });
+
+      document.addEventListener('click', function(e) {
+        console.log('some click event');
+        e.preventDefault();
+        e.stopPropagation();
+        e.cancel = e.cancelBubble = true;
+        e.stopImmediatePropagation();
+        return false;
+      }, true);
+
+    }, 1);
+    setTimeout(function() {
+      // Canvi.MacroManager.start();
+    }, 2500);
+  </script>
   </body>
 </html>

@@ -87,6 +87,8 @@
     "define": false,
     "chrome": false,
     "Backbone": false,
-    "Canvi": false
+    "Canvi": false,
+    "Panel": false,
+    "Handlebars": false
   }
 }

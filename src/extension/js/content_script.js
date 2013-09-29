@@ -1,16 +1,20 @@
 (function() {
   'use strict';
 
+  // var port = chrome.runtime.connect();
+
   console.log('[Canvi] injecting content-script...');
 
-  window.addEventListener('message', function(event) {
-    console.log('[canvi cs] got a window message:', event);
+  window.addEventListener('message', function(message) {
+    console.debug('[canvi cs] got a window message:', message);
 
-    if (event.data === 'debugger-client') {
-      var port = event.ports[0];
+    if (message.data === 'register-canvi') {
+      var port = message.ports[0];
       listenToPort(port);
-    } else if (event.data.type) {
-      chrome.extension.sendMessage(event.data);
+    }
+    else if (message.data.from === 'canvi') {
+      console.debug('[canvi cs]: dispatching to extension:', message);
+      chrome.extension.sendMessage(message.data);
     }
   });
 
@@ -20,18 +24,17 @@
     });
 
     chrome.extension.onMessage.addListener(function(message) {
-      if (message.from === 'devtools') {
+      console.debug('got a message from panel:', message);
+
+      if (message.from === 'panel') {
+        console.debug('[cs]\tforwarding to port');
         port.postMessage(message);
       }
     });
 
-    console.log('listening to port');
+    console.log('listening to port messages');
     port.start();
-  }
-
-  // let ember-debug know that content script has executed
-  document.body.dataset.canvi = 1;
+  };
 
   console.log('[Canvi] content-script injected.');
-
 })();

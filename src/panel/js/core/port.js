@@ -50,7 +50,23 @@
     broadcast: function(message) {
       console.log('got a message:', message);
 
-      this.trigger(message.type, message.data);
+      this.trigger([ message.category, message.label ].join(':'), message.data);
+    },
+
+    /**
+     * Dispatch a request or a response to Canvi.
+     *
+     * @param {String} category   The "category" of messages this message falls under.
+     * @param {String} label      A label that describes this particular message.
+     * @param {Object} [data={}]  Any specific message data.
+     */
+    toCanvi: function(category, label, data) {
+      this.get('chromePort').postMessage({
+        category: category,
+        label: label,
+        data: data || {},
+        from: 'panel'
+      });
     }
   });
 

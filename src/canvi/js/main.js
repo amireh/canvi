@@ -1,20 +1,21 @@
 requirejs.config({
-  baseUrl: 'src/canvi/js',
+  // baseUrl: 'src/canvi/js',
   paths: {
     'text': '../../../vendor/js/require/text',
-    'jquery': '../../../vendor/js/jquery-2.0.2',
+    'jquery': '../../../vendor/js/zepto-1.0',
     'requireLib': '../../../vendor/js/require',
     'backbone': '../../../vendor/js/backbone-1.0.0',
-    'lodash': '../../../vendor/js/lodash-2.1.0'
+    'lodash': '../../../vendor/js/lodash.custom'
   },
 
   shim: {
-    'jquery': { exports: 'jQuery' },
+    'jquery': { exports: 'Zepto' },
     'backbone': {
       deps: [ 'lodash' ],
       exports: 'Backbone'
     },
-    'lodash': { exports: '_' }
+    'lodash': { exports: '_' },
+    'inflection': {}
   },
 
   hbs: {
@@ -26,4 +27,4 @@ requirejs.config({
 
 window.Canvi = {};
 
-require([ 'text', 'jquery', 'app' ], function() {});
+require([ 'text', 'jquery', 'ext/backbone', 'ext/string', 'app' ], function() {});

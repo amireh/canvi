@@ -43,7 +43,7 @@
     "grunt-jsvalidate": "0.2.x",
     "grunt-jsduck": "0.1.x",
     "grunt-string-replace": "0.2.x",
-    "grunt-notify": "0.2.7"
+    "grunt-notify": "x"
   },
   "dependencies": {}
 }

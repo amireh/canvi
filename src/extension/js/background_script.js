@@ -1,5 +1,7 @@
 (function() {
   'use strict';
+
+  // Messages coming in from the content script:
   chrome.extension.onMessage.addListener(function(request, sender) {
     var port = ports[sender.tab.id];
 
@@ -13,6 +15,7 @@
 
   var ports = {};
 
+  // Messages coming in from the panel:
   chrome.extension.onConnect.addListener(function(port) {
     var appId;
 
@@ -29,6 +32,7 @@
         port.onDisconnect.addListener(function() {
           delete ports[appId];
         });
+
         console.log('got the tab id:', appId);
       }
       // else if (message.from === 'devtools') {

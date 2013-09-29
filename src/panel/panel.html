@@ -5,8 +5,8 @@
     <link rel="stylesheet" type="text/css" href="../../dist/panel.css" />
 
     <!-- Vendor libraries needed by the panel app -->
-    <script src="../../vendor/js/jquery-2.0.2.js"></script>
-    <script src="../../vendor/js/lodash-2.1.0.js"></script>
+    <script src="../../vendor/js/zepto-1.0.js"></script>
+    <script src="../../vendor/js/lodash.custom.js"></script>
     <script src="../../vendor/js/backbone-1.0.0.js"></script>
     <script src="../../vendor/js/handlebars.js"></script>
     <script src="../../vendor/js/store.min.js"></script>
@@ -18,15 +18,17 @@
     <script src="js/core/router.js"></script>
     <script src="js/views/macros.js"></script>
 
-    <!-- Canvi client injector -->
+    <!-- Canvi client injector
+    -->
     <script src="js/inject.js"></script>
+
   </head>
 
   <body>
     <aside>
       <nav>
-        <a href="/macros">Macros</a>
-        <a href="/insights">Insights</a>
+        <a class="link-button" href="/macros">Macros</a>
+        <a class="link-button" href="/insights">Insights</a>
       </nav>
     </aside>
 

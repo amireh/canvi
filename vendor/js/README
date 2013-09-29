@@ -1,0 +1,4 @@
+Generate custom lodash build with:
+
+    npm install -g lodash-cli
+    lodash backbone plus=flatten
