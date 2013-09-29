@@ -1,0 +1,13 @@
+[
+  {
+    "name": "Canvi",
+    "groups": [
+      {
+        "name": "Core",
+        "classes": [
+          "Canvi.*"
+        ]
+      }
+    ]
+  }
+]

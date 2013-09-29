@@ -1,1 +1,0 @@
-chrome.devtools.inspectedWindow.eval("console.log('Hi from Canvi.');");
