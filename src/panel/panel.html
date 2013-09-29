@@ -2,13 +2,26 @@
 <html>
   <head>
     <meta encoding="utf-8" />
-    <link rel="stylesheet" type="text/css" href="/dist/panel.css" />
+    <link rel="stylesheet" type="text/css" href="../../dist/panel.css" />
 
-    <script src="/vendor/js/jquery-1.9.1.js"></script>
-    <script src="js/panel.js"></script>
+    <script src="../../vendor/js/jquery-2.0.2.js"></script>
+    <script src="../../vendor/js/lodash-2.1.0.js"></script>
+    <script src="../../vendor/js/backbone-1.0.0.js"></script>
+
+    <script src="js/namespace.js"></script>
+    <script src="js/core/port.js"></script>
+    <script src="js/core/router.js"></script>
     <script src="js/inject.js"></script>
   </head>
 
   <body>
+    <aside>
+      <nav>
+        <a href="/macros">Macros</a>
+        <a href="/insights">Insights</a>
+      </nav>
+    </aside>
+
+    <div id="content"></div>
   </body>
 </html>
