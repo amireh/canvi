@@ -4,13 +4,21 @@
     <meta encoding="utf-8" />
     <link rel="stylesheet" type="text/css" href="../../dist/panel.css" />
 
+    <!-- Vendor libraries needed by the panel app -->
     <script src="../../vendor/js/jquery-2.0.2.js"></script>
     <script src="../../vendor/js/lodash-2.1.0.js"></script>
     <script src="../../vendor/js/backbone-1.0.0.js"></script>
+    <script src="../../vendor/js/handlebars.js"></script>
+    <script src="../../vendor/js/store.min.js"></script>
 
+    <!-- The Panel App -->
     <script src="js/namespace.js"></script>
+    <script src="js/core/util.js"></script>
     <script src="js/core/port.js"></script>
     <script src="js/core/router.js"></script>
+    <script src="js/views/macros.js"></script>
+
+    <!-- Canvi client injector -->
     <script src="js/inject.js"></script>
   </head>
 
@@ -23,5 +31,8 @@
     </aside>
 
     <div id="content"></div>
+
+    <!-- Start the Panel app -->
+    <script src="js/start.js"></script>
   </body>
 </html>

@@ -52,6 +52,7 @@ var proxyConsole = function() {
   'use strict';
 
   root.Panel = {};
+  root.Panel.Storage = window.store;
 
   proxyConsole();
 })();
