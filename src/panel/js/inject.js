@@ -1,21 +1,30 @@
 (function() {
   'use strict';
 
+  var runScript = function(path) {
+    var xhr;
+
+    xhr = new XMLHttpRequest();
+    xhr.open('GET', chrome.extension.getURL(path), false);
+    xhr.send();
+    chrome.devtools.inspectedWindow.eval(xhr.responseText);
+  };
+
   /**
    * Pull Canvi.js via XHR and inject it into the inspected page JS environment.
    */
   function injectCanvi() {
-    var canvi;
-    var xhr = new XMLHttpRequest();
-    // xhr.open('GET', chrome.extension.getURL('/src/canvi/js/app.js'), false);
-    xhr.open('GET', chrome.extension.getURL('/dist/canvi.min.js'), false);
-    xhr.send();
+    runScript('/vendor/js/require.js');
+    runScript('/src/canvi/js/main.js');
 
-    canvi = '(function() { ' + xhr.responseText + ' }());';
-
-    chrome.devtools.inspectedWindow.eval('console.log(' + JSON.stringify(xhr) + ');');
-
-    chrome.devtools.inspectedWindow.eval(xhr.responseText);
+    // We'll do this for development so we won't have to recompile the JS
+    // everytime we do a change.
+    chrome.devtools.inspectedWindow.eval(
+      'window.requirejs.config({' +
+        'baseUrl: "' + chrome.extension.getURL('/src/canvi/js') + '"' +
+      '});',
+      function(result, isException) {}
+    );
   }
 
   if (typeof chrome !== 'undefined' && chrome.devtools) {

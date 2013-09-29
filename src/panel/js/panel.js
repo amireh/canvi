@@ -10,5 +10,6 @@
 
   port.onMessage.addListener(function(message) {
     console.info('[canvi] panel got a message:', message);
+    $('body').append('<li>' + message.type + '</li>');
   });
 })();

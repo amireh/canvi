@@ -85,7 +85,7 @@
     "jQuery"      : false,
     "$"           : false,
     "define": false,
-    "i18n": false,
-    "chrome": false
+    "chrome": false,
+    "Backbone": false
   }
 }
