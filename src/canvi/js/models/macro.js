@@ -83,6 +83,10 @@ define('models/macro', [
 
       if (nextEntry) {
         setTimeout(function() {
+          if (!that.isPlaying()) {
+            return;
+          }
+
           that.play(options, nextEntry);
         }, options.pauseTimer);
       } else {
@@ -227,12 +231,17 @@ define('models/macro', [
       }
     },
 
+    isIdle: function() {
+      return this.get('status') === 'idle';
+    },
     isRecording: function() {
       return this.get('status') === 'recording';
     },
-
     isPlaying: function() {
       return this.get('status') === 'playing';
+    },
+    isPaused: function() {
+      return this.get('status') === 'paused';
     }
   });
 });

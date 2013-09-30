@@ -186,7 +186,7 @@
           this.$stop.enable();
         break;
         case 'paused':
-          this.$pause.enable();
+          this.$play.enable();
           this.$stop.enable();
         break;
         case 'idle':

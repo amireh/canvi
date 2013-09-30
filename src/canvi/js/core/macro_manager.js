@@ -195,7 +195,14 @@ define('core/macro_manager', [ 'lodash', 'backbone', 'models/macro' ], function(
      * Macro playback.
      */
     play: function(options) {
-      if (this.current && !this.current.isPlaying()) {
+      if (!this.current) {
+        return;
+      }
+
+      if (this.current.isPaused()) {
+        this.current.resume();
+      }
+      else if (!this.current.isPlaying()) {
         this.current.play(options);
       }
     },
