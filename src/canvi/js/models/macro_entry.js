@@ -12,6 +12,27 @@ define('models/macro_entry', [
       type: null,
       target: null,
       url: null
+    },
+
+    simulate: function(options, callback) {
+      var handlerId = [ 'simulate', this.get('type') ].join('-').camelize();
+      var handler = this[ handlerId ];
+
+      if (handler) {
+        this[handlerId](options, callback);
+      }
+    },
+
+    simulateClick: function(options, callback) {
+      var $target = $( this.get('target') );
+
+      if (!$target.length) {
+        return console.error('target not found:', this.get('target'));
+      }
+
+      $target.click();
+
+      callback(this);
     }
   });
 });

@@ -17,13 +17,16 @@
       'macros:recordingStarted': 'onRecordingStarted',
       'macros:recordingStopped': 'onRecordingStopped',
       'macros:entryRemoved': 'onEntryRemoved',
+      'macros:playingEntry': 'onPlayingEntry',
       'macros:removed': 'goToIndex'
     },
 
+    delegate: 'body',
     events: {
       'click [data-action="start"]': 'proxyStartRecording',
       'click [data-action="pause"]': 'proxyPauseRecording',
       'click [data-action="stop"]': 'proxyStopRecording',
+      'click [data-action="play"]': 'proxyPlay',
       'click [data-action="remove"]': 'proxyRemoveMacro',
       'click [data-action="removeEntry"]': 'proxyRemoveEntry',
       'click [data-action="reload"]': 'reload',
@@ -37,6 +40,7 @@
       }
     },
 
+
     render: function(macroId) {
       if (this.$el) {
         this.remove();
@@ -46,6 +50,7 @@
       this.bind();
 
       $('#content').html( this.$el );
+      $('#toolbar').html( this.$('.toolbar') );
 
       this.$start = this.$('[data-action="start"]');
       this.$pause = this.$('[data-action="pause"]');
@@ -132,6 +137,23 @@
     },
     onEntryRemoved: function(entryIndex) {
       this.$listing.find('.macro-entry:nth-child(' + (entryIndex+1) + ')').remove();
+    },
+
+    proxyPlay: function() {
+      Panel.Port.toCanvi('macros', 'play', {});
+    },
+
+    onPlayingEntry: function(entryIndex) {
+      var $entry = this.__$entry(entryIndex);
+
+      if ($entry.length) {
+        this.$listing.find('.active').removeClass('active');
+        $entry.addClass('active')
+      }
+    },
+
+    __$entry: function(entryIndex) {
+      return this.$listing.find('.macro-entry:nth-child(' + (entryIndex+1) + ')');
     }
   });
 

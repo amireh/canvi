@@ -15,6 +15,7 @@ define('models/macro', [
     url: '/macros',
 
     defaults: {
+      status: 'idle'
     },
 
     initialize: function() {
@@ -27,10 +28,18 @@ define('models/macro', [
     },
 
     pause: function() {
+      if (this.isPlaying()) {
+        this.pausePlaying();
+      }
+
       this.set('status', 'paused');
     },
 
     resume: function() {
+      if (this.entry) {
+        return this.resumePlaying();
+      }
+
       this.start();
       this.entries.each(function(entry) {
         entry.collection.trigger('add', entry);
@@ -41,13 +50,67 @@ define('models/macro', [
      * Uninstall all event interceptors.
      */
     stop: function() {
-      this.set('status', 'stopped');
+      this.set('status', 'idle');
+      this.entry = null;
     },
 
     onClick: function(e) {
       console.debug('[Canvi] something was clicked');
       this.addEntry('click', e.target, window.location.href);
     },
+
+    play: function(options, entry) {
+      var that = this;
+      var entryIndex;
+
+      _.extend(this.options, {
+        pauseTimer: 500
+      }, options);
+
+      this.entry = entry || this.entries.first();
+      entryIndex = this.entries.indexOf(this.entry);
+
+      if (this.entry) {
+        this.set({ 'status': 'playing' });
+
+        console.info('playing entry:', entryIndex);
+
+        Canvi.Messenger.toPanel('macros', 'playingEntry', entryIndex);
+
+        this.entry.simulate(options, function() {
+          that.playNext();
+        });
+      } else {
+        this.stopPlaying();
+      }
+    },
+
+    playNext: function() {
+      var entryIndex = this.entries.indexOf(this.entry);
+      var nextEntry = that.entries.at(entryIndex + 1);
+      var that = this;
+      var options = this.options;
+
+      if (nextEntry) {
+        setTimeout(function() {
+          that.play(options, nextEntry);
+        }, options.pauseTimer);
+      }
+    }
+
+    pausePlaying: function() {
+      this.playNext = function() {};
+    },
+
+    resumePlaying: function() {
+      this.play({}, this.entry);
+    },
+
+    stopPlaying: function() {
+      this.pausePlaying();
+      this.entry = null;
+      this.stop();
+    }
 
     /**
      * @private
@@ -149,6 +212,14 @@ define('models/macro', [
       if (!this.entries) {
         this.entries = new MacroEntrySet(null);
       }
+    },
+
+    isRecording: function() {
+      return this.get('status') !== 'playing';
+    },
+
+    isPlaying: function() {
+      return this.get('status') === 'playing';
     }
   });
 });

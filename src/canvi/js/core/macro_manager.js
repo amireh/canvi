@@ -161,7 +161,6 @@ define('core/macro_manager', [ 'lodash', 'backbone', 'models/macro' ], function(
 
         Canvi.Messenger.toPanel('macros', 'entryRemoved', entryIndex);
       }
-
     },
 
     /**
@@ -185,7 +184,7 @@ define('core/macro_manager', [ 'lodash', 'backbone', 'models/macro' ], function(
      * @private
      */
     passToMacro: function(eventType, event) {
-      if (this.current) {
+      if (this.current && this.current.isRecording()) {
         var evtName = [ 'on', eventType ].join('_').camelize();
 
         console.debug('recording into macro:', evtName);

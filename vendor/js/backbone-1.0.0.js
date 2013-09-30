@@ -1031,6 +1031,7 @@
       if (this.$el) this.undelegateEvents();
       this.$el = element instanceof Backbone.$ ? element : Backbone.$(element);
       this.el = this.$el[0];
+      this.$delegate = this.delegate ? $(this.delegate) : this.$el;
       if (delegate !== false) this.delegateEvents();
       return this;
     },
@@ -1050,7 +1051,7 @@
     // Omitting the selector binds the event to `this.el`.
     // This only works for delegate-able events: not `focus`, `blur`, and
     // not `change`, `submit`, and `reset` in Internet Explorer.
-    delegateEvents: function(events) {
+    delegateEvents: function(events, $delegate) {
       if (!(events || (events = _.result(this, 'events')))) return this;
       this.undelegateEvents();
       for (var key in events) {
@@ -1063,9 +1064,9 @@
         method = _.bind(method, this);
         eventName += '.delegateEvents' + this.cid;
         if (selector === '') {
-          this.$el.on(eventName, method);
+          this.$delegate.on(eventName, method);
         } else {
-          this.$el.on(eventName, selector, method);
+          this.$delegate.on(eventName, selector, method);
         }
       }
       return this;
@@ -1075,7 +1076,7 @@
     // You usually don't need to use this, but may wish to if you have multiple
     // Backbone views attached to the same DOM element.
     undelegateEvents: function() {
-      this.$el.off('.delegateEvents' + this.cid);
+      this.$delegate.off('.delegateEvents' + this.cid);
       return this;
     },
 

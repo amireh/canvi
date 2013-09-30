@@ -4,6 +4,8 @@
 @whitespace: 10px;
 @foreground: #444;
 @shade: #bbb;
+@nav-width: 120px;
+@toolbar-height: 24px;
 
 .linear-gradient(@gradientLine; @colorStops...) {
   background-image: -webkit-linear-gradient(@gradientLine, @colorStops);
@@ -25,11 +27,12 @@ body {
   opacity: 0.5;
 }
 
-.toolbar {
+#toolbar {
   position: absolute;
   bottom: 0;
   left: 0;
   right: 0;
+  height: @toolbar-height;
   overflow: hidden;
   margin: @whitespace 0 0 0;
   border-top: 1px solid #ddd;
@@ -54,10 +57,6 @@ body {
     }
   }
 }
-
-
-@nav-width: 120px;
-@toolbar-height: 24px;
 
 nav {
   width: @nav-width;
@@ -110,7 +109,12 @@ nav {
 }
 
 #content {
-  margin-left: @nav-width;
+  position: absolute;
+  left: @nav-width;
+  right: 0;
+  top: 0;
+  bottom: @toolbar-height;
+  overflow: auto;
 }
 
 .icon-orange    { color: #FFBB33; }
@@ -159,6 +163,10 @@ tr:last-child td {
   border-bottom: 1px solid #ddd;
 }
 
+tr.active {
+  background-color: @blue;
+  color: white;
+}
 .pull-right {
   float: right;
 }
