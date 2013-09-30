@@ -59,5 +59,9 @@
     });
   };
 
+  window.notifyCanvi = function(idCanvi, message) {
+    chrome.tabs.sendMessage(idCanvi, message);
+  };
+
   console.log('ready to establish links between canvi and panel instances');
 })();

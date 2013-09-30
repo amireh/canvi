@@ -6,6 +6,12 @@
   var jstEntry = Panel.Util.jst('macros/entry');
 
   Panel.MacroView = Backbone.View.extend({
+    /**
+     * @property {Macro}
+     * The macro that Canvi is currently managing.
+     */
+    macro: null,
+
     messages: {
       'macros:entry': 'appendMacroEntry',
       'macros:recordingStarted': 'onRecordingStarted',
@@ -58,6 +64,7 @@
 
     remove: function() {
       Panel.Port.toCanvi('macros', 'stop');
+      this.macro = null;
 
       Backbone.View.prototype.remove.apply(this, arguments);
     },
@@ -67,7 +74,7 @@
     },
 
     proxyStartRecording: function() {
-      Panel.Port.toCanvi('macros', 'start');
+      Panel.Port.toCanvi('macros', 'start', this.macro || {});
     },
 
     proxyPauseRecording: function() {
@@ -88,6 +95,8 @@
       this.$start.disable();
       this.$pause.enable();
       this.$stop.enable();
+
+      this.macro = macro;
 
       _.each(macro.entries, function(entry) {
         this.appendMacroEntry(entry);

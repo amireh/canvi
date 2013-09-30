@@ -18,10 +18,8 @@ define('models/macro', [
     },
 
     initialize: function() {
-      this.entries = new MacroEntrySet(null);
-      this.listenTo(this.entries, 'add', this.announceEntry);
-
       this.ensureId();
+      this.ensureEntries();
     },
 
     start: function() {
@@ -83,13 +81,15 @@ define('models/macro', [
       this.trigger('change', this);
     },
 
-    announceEntry: function(entry) {
-      console.info('new macro entry:', entry);
-    },
-
     parse: function(data) {
-      this.entries = new MacroEntrySet(data.entries, { parse: true, remove: false });
-      delete data.entries;
+      console.log('macro raw data:', data);
+
+      if (data.entries) {
+        this.ensureEntries();
+        console.debug('macro cached entries:', data.entries);
+        this.entries.set(data.entries, { parse: true, remove: false });
+        delete data.entries;
+      }
 
       if (!data.id) {
         data.id = 'macro_' + this.cid;
@@ -111,6 +111,11 @@ define('models/macro', [
         this.set({
           id: 'macro_' + this.cid
         });
+      }
+    },
+    ensureEntries: function() {
+      if (!this.entries) {
+        this.entries = new MacroEntrySet(null);
       }
     }
   });
