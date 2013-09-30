@@ -27,6 +27,4 @@ requirejs.config({
   }
 });
 
-window.Canvi = {};
-
 require([ 'text', 'jquery', 'ext/string', 'app' ], function() {});

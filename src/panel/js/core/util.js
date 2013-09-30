@@ -1,6 +1,11 @@
 (function() {
   'use strict';
 
+  /**
+   * @class Panel.Util
+   *
+   * Common helpers.
+   */
   Panel.Util = {};
 
   /**

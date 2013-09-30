@@ -1,6 +1,11 @@
 (function() {
   'use strict';
 
+  /**
+   * @class Panel.Router
+   *
+   * Panel Backbone.js router for navigating around the panel.
+   */
   var Router = Backbone.Router.extend({
     routes: {
       'macros': 'showMacros',

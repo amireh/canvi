@@ -5,6 +5,11 @@
   var jstIndex = Panel.Util.jst('macros/show');
   var jstEntry = Panel.Util.jst('macros/entry');
 
+  /**
+   * @class Panel.Views.MacroView
+   *
+   * A single Macro view.
+   */
   Panel.MacroView = Backbone.View.extend({
     /**
      * @property {Macro}
@@ -219,5 +224,12 @@
     }
   });
 
+  /**
+   * @class Panel
+   */
+
+  /**
+   * @property {Panel.Views.MacroView} MacroView Global instance.
+   */
   Panel.MacroView = new Panel.MacroView();
 })();

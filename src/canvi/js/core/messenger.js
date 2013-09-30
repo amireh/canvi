@@ -1,6 +1,12 @@
 define('core/messenger', [ 'backbone' ], function(Backbone) {
   'use strict';
 
+  /**
+   * @class Canvi.Messenger
+   * @alternateClassName Messenger
+   *
+   * Communication channel between the Google Chrome extension and Canvi.
+   */
   return Backbone.Model.extend({
     defaults: {
       port: null

@@ -7,8 +7,32 @@ define('app', [
 
   console.log('[Canvi] hi!');
 
+  /**
+   * @class Canvi
+   *
+   * Canvi namespace.
+   */
+  window.Canvi = {};
+
+  /**
+   * @property {store} Storage
+   *
+   * A localStorage adapter.
+   */
   Canvi.Storage = Store;
+
+  /**
+   * @property {Messenger} Messenger
+   *
+   * A global Messenger instance for communication.
+   */
   Canvi.Messenger = new Messenger();
+
+  /**
+   * @property {MacroManager} MacroManager
+   *
+   * A global MacroManager instance for managing macros.
+   */
   Canvi.MacroManager = new MacroManager();
 
   // Export a shortcut for backbone entities to whisper to Panel:

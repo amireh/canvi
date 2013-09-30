@@ -8,9 +8,9 @@
    *
    * The faulty script will actually be linked (and openable) in the console.
    *
-   * @param  {String} e The exception message.
-   * @param  {String} file The file in which the error was raised.
-   * @param  {[type]} line The line that raised the error.
+   * @param {String} e The exception message.
+   * @param {String} file The file in which the error was raised.
+   * @param {Number} line The line that raised the error.
    */
   window.onerror = function(e, file, line) {
     console.error(e + ' in: ' + file + ':' + line);
@@ -50,7 +50,18 @@
     });
   };
 
+  /**
+   * @class Panel
+   *
+   * The Panel namespace.
+   */
   root.Panel = {};
+
+  /**
+   * @property {localStorage} Storage
+   *
+   * A localStorage adapter.
+   */
   root.Panel.Storage = window.store;
 
   proxyConsole();

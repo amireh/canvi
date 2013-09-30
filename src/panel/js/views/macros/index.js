@@ -5,6 +5,11 @@
   var jstIndex = Panel.Util.jst('macros/index');
   var jstListing = Panel.Util.jst('macros/listing');
 
+  /**
+   * @class Panel.Views.MacrosView
+   *
+   * Index listing of macros.
+   */
   Panel.MacrosView = Backbone.View.extend({
     messages: {
       'macros:list': 'listMacros'
@@ -64,5 +69,12 @@
     }
   });
 
+  /**
+   * @class Panel
+   */
+
+  /**
+   * @property {Panel.Views.MacrosView} MacrosView Global instance.
+   */
   Panel.MacrosView = new Panel.MacrosView();
 })();

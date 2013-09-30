@@ -4,6 +4,12 @@ define('models/macro_entry', [
 ], function(_, Backbone) {
   'use strict';
 
+  /**
+   * @class Canvi.MacroEntry
+   * @alternateClassName MacroEntry
+   *
+   * A single captured DOM event that can be simulated.
+   */
   return Backbone.Model.extend({
     urlRoot: '/macro_entries',
     url: '/macro_entries',
@@ -14,6 +20,9 @@ define('models/macro_entry', [
       url: null
     },
 
+    /**
+     * Simulate the entry, as if the user has done the event.
+     */
     simulate: function(options, callback) {
       var handlerId = [ 'simulate', this.get('type') ].join('-').camelize();
       var handler = this[ handlerId ];

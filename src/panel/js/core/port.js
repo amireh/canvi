@@ -2,7 +2,9 @@
   'use strict';
 
   /**
-   * @class Port
+   * @class Panel.Port
+   * @alternateClassName Port
+   *
    * Messenger between the Chrome background script and the Panel.
    */
   var Port = Backbone.Model.extend({

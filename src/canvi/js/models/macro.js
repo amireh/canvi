@@ -10,6 +10,13 @@ define('models/macro', [
     model: MacroEntry
   });
 
+
+  /**
+   * @class Canvi.Macro
+   * @alternateClassName Macro
+   *
+   * A recording of captured DOM events that can be played back.
+   */
   return Backbone.Model.extend({
     urlRoot: '/macros',
     url: '/macros',
@@ -39,6 +46,9 @@ define('models/macro', [
       this.set('status', 'recording');
     },
 
+    /**
+     * Playback the macro.
+     */
     play: function(options, entry) {
       var that = this;
       var entryIndex;
@@ -71,6 +81,9 @@ define('models/macro', [
       });
     },
 
+    /**
+     * @private
+     */
     playNext: function() {
       if (!this.isPlaying()) {
         return;
@@ -110,11 +123,6 @@ define('models/macro', [
       if (this.entry) {
         return this.play({}, this.entry);
       }
-
-      // this.start();
-      // this.entries.each(function(entry) {
-      //   entry.collection.trigger('add', entry);
-      // });
     },
 
     /**

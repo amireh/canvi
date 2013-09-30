@@ -1,6 +1,12 @@
 define('core/macro_manager', [ 'lodash', 'backbone', 'models/macro' ], function(_, Backbone, Macro) {
   'use strict';
 
+  /**
+   * @class Canvi.MacroManager
+   * @alternateClassName MacroManager
+   *
+   * Interface for recording and playing macros.
+   */
   return Backbone.Collection.extend({
     model: Macro,
     urlRoot: '/macros',
