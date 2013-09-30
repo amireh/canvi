@@ -11,6 +11,13 @@
     initialize: function() {
       var that = this;
 
+      // Panel reload hook
+      $(document).on('click', '[data-action="reload"]', function() {
+        window.location.reload(true);
+
+        return false;
+      });
+
       // Route all links
       $(document).on('click', 'a', function(e) {
         var url = $(this).attr('href');

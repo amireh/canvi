@@ -10,9 +10,11 @@
       'macros:list': 'listMacros'
     },
 
+    delegate: 'body',
+
     events: {
-      'click [data-action="new"]': 'newMacro',
-      'click [data-action="reload"]': 'reload',
+      'click [data-action="new"]': 'proxyNewMacro',
+      'click [data-action="reset"]': 'proxyResetMacros'
     },
 
     bind: function() {
@@ -32,6 +34,8 @@
       this.bind();
 
       $('#content').html( this.$el );
+      $('#active_toolbar').html( this.$('.toolbar') );
+
       this.$listing = this.$('#macros');
 
       this.toCanvi('macros', 'list');
@@ -54,13 +58,9 @@
       this.$listing.html(jstListing(data));
     },
 
-    newMacro: function() {
+    proxyNewMacro: function() {
       this.toCanvi('macros', 'start');
       Panel.Router.showMacro();
-    },
-
-    reload: function() {
-      window.location.reload(true);
     }
   });
 

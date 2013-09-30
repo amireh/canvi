@@ -33,10 +33,10 @@ define('core/macro_manager', [ 'lodash', 'backbone', 'models/macro' ], function(
       this.on('add change remove', this.updateCache, this);
 
       // Pick up where we left off if we're coming from a reload:
-      var activeMacros = this.where({ status: 'active' });
+      var activeMacros = this.where({ status: 'recording' });
 
       if (activeMacros.length) {
-        this.start({
+        this.record({
           id: activeMacros[0].id
         });
       }
@@ -45,13 +45,42 @@ define('core/macro_manager', [ 'lodash', 'backbone', 'models/macro' ], function(
       Canvi.Messenger.bindToNamespace('macros', this);
     },
 
+    focus: function(macro) {
+      macro = macro || {};
+
+      if (macro.id) {
+
+        // Stop the focused one, if any
+        if (this.current) {
+          this.stop();
+        }
+
+        this.current = this.get(macro.id);
+
+        if (this.current) {
+          // Broadcast status updates
+          this.listenTo(this.current, 'change:status', function() {
+            Canvi.Messenger.toPanel('macros', 'statusUpdated', this.current.get('status'));
+          });
+
+          Canvi.Messenger.toPanel('macros', 'focused', this.current.toJSON());
+
+          return true;
+        }
+        else {
+          Canvi.Messenger.toPanel('errors', 'noSuchMacro');
+          return false;
+        }
+      }
+    },
+
     /**
      * Start recording a macro.
      *
      * @param {Macro} [macro=null]
      * Macro to focus. If none is specified, a new macro is created.
      */
-    start: function(macro) {
+    record: function(macro) {
       if (this.current) {
         this.current.stop();
       }
@@ -59,10 +88,7 @@ define('core/macro_manager', [ 'lodash', 'backbone', 'models/macro' ], function(
       console.log('recording a new macro.');
 
       if (macro.id) {
-        this.current = this.get(macro.id);
-
-        if (!this.current) {
-          Canvi.Messenger.toPanel('errors', 'noSuchMacro');
+        if (!this.focus(macro)) {
           return false;
         }
       }
@@ -70,7 +96,7 @@ define('core/macro_manager', [ 'lodash', 'backbone', 'models/macro' ], function(
         this.current = this.add({}).last();
       }
 
-      this.current.start();
+      this.current.record();
 
       // Listen to the macro entry additions so we can tell the Panel to update
       this.listenTo(this.current.entries, 'add', function(entry) {
@@ -112,12 +138,12 @@ define('core/macro_manager', [ 'lodash', 'backbone', 'models/macro' ], function(
       if (this.current) {
         console.log('stopping macro');
 
-        this.stopListening(this.current.entries);
-
         this.current.stop();
-        this.current = null;
 
-        Canvi.Messenger.toPanel('macros', 'recordingStopped');
+        this.stopListening(this.current.entries);
+        this.stopListening(this.current);
+
+        this.current = null;
       }
     },
 
@@ -153,13 +179,15 @@ define('core/macro_manager', [ 'lodash', 'backbone', 'models/macro' ], function(
      * @param  {Number} entryIndex Entry index.
      */
     removeEntry: function(entryIndex) {
-      var entry = this.current.entries.at(entryIndex);
+      if (this.current) {
+        var entry = this.current.entries.at(entryIndex);
 
-      if (entry) {
-        this.current.entries.remove(entry);
-        this.updateCache();
+        if (entry) {
+          this.current.entries.remove(entry);
+          this.updateCache();
 
-        Canvi.Messenger.toPanel('macros', 'entryRemoved', entryIndex);
+          Canvi.Messenger.toPanel('macros', 'entryRemoved', entryIndex);
+        }
       }
     },
 
@@ -167,7 +195,7 @@ define('core/macro_manager', [ 'lodash', 'backbone', 'models/macro' ], function(
      * Macro playback.
      */
     play: function(options) {
-      if (this.current) {
+      if (this.current && !this.current.isPlaying()) {
         this.current.play(options);
       }
     },

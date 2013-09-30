@@ -33,10 +33,21 @@ body {
   left: 0;
   right: 0;
   height: @toolbar-height;
+  line-height: @toolbar-height;
   overflow: hidden;
   margin: @whitespace 0 0 0;
   border-top: 1px solid #ddd;
   background: #f4f4f4;
+
+  span {
+    display: inline-block;
+    margin: 0 @whitespace;
+    text-transform: capitalize;
+  }
+
+  * {
+    vertical-align: middle;
+  }
 
   button[class*="icon"] {
     padding: @whitespace / 2 @whitespace;
@@ -117,11 +128,15 @@ nav {
   overflow: auto;
 }
 
+@blue: #33B5E5;
+@green: #1ABC9C;
+@red: #D14836;
+
 .icon-orange    { color: #FFBB33; }
 .icon-yellow    { color: #FFBA00; }
-.icon-green     { color: #1ABC9C; }
-.icon-red       { color: #D14836; }
-.icon-blue      { color: #33B5E5; }
+.icon-green     { color: @green; }
+.icon-red       { color: @red; }
+.icon-blue      { color: @blue; }
 .icon-purple    { color: #AA66CC; }
 .icon-white     { color: #FFFFFF; }
 
@@ -163,12 +178,28 @@ tr:last-child td {
   border-bottom: 1px solid #ddd;
 }
 
-tr.active {
-  background-color: @blue;
-  color: white;
+tr {
+  &.active {
+    background-color: @blue;
+    color: white;
+  }
+
+  &.passed {
+    background-color: @green;
+    color: white;
+  }
+
+  &.failed {
+    background-color: @red;
+    color: white;
+  }
 }
+
 .pull-right {
-  float: right;
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 1;
 }
 
 .text-center {

@@ -27,12 +27,13 @@ define('models/macro_entry', [
       var $target = $( this.get('target') );
 
       if (!$target.length) {
-        return console.error('target not found:', this.get('target'));
+        console.error('target not found:', this.get('target'));
+        return callback(this, 'not_found');
       }
 
       $target.click();
 
-      callback(this);
+      callback(this, true);
     }
   });
 });

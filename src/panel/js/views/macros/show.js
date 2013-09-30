@@ -13,25 +13,29 @@
     macro: null,
 
     messages: {
+      'macros:focused': 'onFocused',
       'macros:entry': 'appendMacroEntry',
-      'macros:recordingStarted': 'onRecordingStarted',
-      'macros:recordingStopped': 'onRecordingStopped',
       'macros:entryRemoved': 'onEntryRemoved',
       'macros:playingEntry': 'onPlayingEntry',
-      'macros:removed': 'goToIndex'
+      'macros:entryPlayed': 'onEntryPlayed',
+      'macros:statusUpdated': 'onStatusUpdated',
+      'macros:removed': 'backToIndex'
     },
 
     delegate: 'body',
+
     events: {
-      'click [data-action="start"]': 'proxyStartRecording',
-      'click [data-action="pause"]': 'proxyPauseRecording',
-      'click [data-action="stop"]': 'proxyStopRecording',
+      'click [data-action="record"]': 'proxyRecord',
+      'click [data-action="pause"]': 'proxyPause',
+      'click [data-action="stop"]': 'proxyStop',
       'click [data-action="play"]': 'proxyPlay',
-      'click [data-action="remove"]': 'proxyRemoveMacro',
-      'click [data-action="removeEntry"]': 'proxyRemoveEntry',
-      'click [data-action="reload"]': 'reload',
+      'click [data-action="remove"]': 'proxyRemove',
+      'click [data-action="removeEntry"]': 'proxyRemoveEntry'
     },
 
+    /**
+     * Bind message handlers via the Panel.Port.
+     */
     bind: function() {
       for (var event in this.messages) {
         var handler = this[ this.messages[event] ];
@@ -39,7 +43,6 @@
         this.listenTo(Panel.Port, event, handler);
       }
     },
-
 
     render: function(macroId) {
       if (this.$el) {
@@ -49,28 +52,24 @@
       this.setElement( jstIndex({}) );
       this.bind();
 
-      $('#content').html( this.$el );
-      $('#toolbar').html( this.$('.toolbar') );
-
-      this.$start = this.$('[data-action="start"]');
+      this.$status = this.$('#macro_status');
+      this.$record = this.$('[data-action="record"]');
+      this.$play = this.$('[data-action="play"]');
       this.$pause = this.$('[data-action="pause"]');
       this.$stop  = this.$('[data-action="stop"]');
       this.$remove = this.$('[data-action="remove"]');
+      this.$controls = this.$('[data-action]');
 
       this.$listing = this.$('#entries');
 
-      this.$pause.disable();
-      this.$stop.disable();
+      $('#content').html( this.$el );
+      $('#active_toolbar').html( this.$('.toolbar') );
 
-      console.debug('launching macro:', macroId);
-
-      Panel.Port.toCanvi('macros', 'start', {
-        id: macroId
-      });
+      Panel.Port.toCanvi('macros', 'focus', { id: macroId });
     },
 
     remove: function() {
-      Panel.Port.toCanvi('macros', 'stop');
+      this.proxyStop();
       this.macro = null;
 
       Backbone.View.prototype.remove.apply(this, arguments);
@@ -80,52 +79,28 @@
       this.$listing.append(jstEntry(message));
     },
 
-    proxyStartRecording: function() {
-      Panel.Port.toCanvi('macros', 'start', this.macro || {});
+    proxyRecord: function() {
+      Panel.Port.toCanvi('macros', 'record', this.macro);
     },
 
-    proxyPauseRecording: function() {
+    proxyPlay: function() {
+      Panel.Port.toCanvi('macros', 'play');
+      this.resetEntries();
+    },
+
+    proxyPause: function() {
       Panel.Port.toCanvi('macros', 'pause');
     },
 
-    proxyStopRecording: function() {
+    proxyStop: function() {
       Panel.Port.toCanvi('macros', 'stop');
+      Panel.Port.toCanvi('macros', 'focus', this.macro);
     },
 
-    proxyRemoveMacro: function() {
+    proxyRemove: function() {
       if (confirm('Are you sure you want to do this?')) {
         Panel.Port.toCanvi('macros', 'remove');
       }
-    },
-
-    onRecordingStarted: function(macro) {
-      this.$start.disable();
-      this.$pause.enable();
-      this.$stop.enable();
-
-      this.macro = macro;
-
-      _.each(macro.entries, function(entry) {
-        this.appendMacroEntry(entry);
-      }, this);
-    },
-
-    onRecordingStopped: function() {
-      this.$start.enable();
-      this.$pause.disable();
-      this.$stop.disable();
-    },
-
-    clearEntries: function() {
-      this.$listing.empty();
-    },
-
-    reload: function() {
-      window.location.reload(true);
-    },
-
-    goToIndex: function() {
-      Panel.Router.showMacros();
     },
 
     proxyRemoveEntry: function(e) {
@@ -135,25 +110,99 @@
         Panel.Port.toCanvi('macros', 'removeEntry', $entry.index());
       }
     },
-    onEntryRemoved: function(entryIndex) {
-      this.$listing.find('.macro-entry:nth-child(' + (entryIndex+1) + ')').remove();
-    },
 
-    proxyPlay: function() {
-      Panel.Port.toCanvi('macros', 'play', {});
-    },
+    onFocused: function(macro) {
+      if (!this.macro) {
+        this.macro = macro;
 
-    onPlayingEntry: function(entryIndex) {
-      var $entry = this.__$entry(entryIndex);
+        _.each(macro.entries, function(entry) {
+          this.appendMacroEntry(entry);
+        }, this);
 
-      if ($entry.length) {
-        this.$listing.find('.active').removeClass('active');
-        $entry.addClass('active')
+        this.onStatusUpdated(macro.status);
       }
     },
 
-    __$entry: function(entryIndex) {
+    clearEntries: function() {
+      this.$listing.empty();
+    },
+
+    backToIndex: function() {
+      Panel.Router.showMacros();
+    },
+
+    /**
+     * Remove an entry from the macro entry listing.
+     *
+     * @param {Number} entryIndex
+     */
+    onEntryRemoved: function(entryIndex) {
+      var $entry = this.findEntry(entryIndex);
+
+      if ($entry.length) {
+        $entry.remove();
+      }
+    },
+
+    /**
+     * Highlight the macro entry currently being played.
+     *
+     * @param {Number} entryIndex
+     */
+    onPlayingEntry: function(entryIndex) {
+      var $entry = this.findEntry(entryIndex);
+
+      if ($entry.length) {
+        this.$listing.find('.active').removeClass('active');
+        $entry.addClass('active');
+      }
+    },
+
+    onEntryPlayed: function(data) {
+      var $entry = this.findEntry(data.entryIndex);
+      var status = data.status;
+
+      switch(data.status) {
+        case 'not_found':
+          $entry.addClass('failed');
+        break;
+        case true:
+          $entry.addClass('passed');
+        break;
+      }
+
+    },
+
+    onStatusUpdated: function(status) {
+      this.$status.text( status );
+      this.$controls.disable();
+
+      switch(status) {
+        case 'recording':
+          this.$stop.enable();
+        break;
+        case 'playing':
+          this.$pause.enable();
+          this.$stop.enable();
+        break;
+        case 'paused':
+          this.$pause.enable();
+          this.$stop.enable();
+        break;
+        case 'idle':
+          this.$play.enable();
+          this.$record.enable();
+          this.$remove.enable();
+        break;
+      }
+    },
+
+    findEntry: function(entryIndex) {
       return this.$listing.find('.macro-entry:nth-child(' + (entryIndex+1) + ')');
+    },
+
+    resetEntries: function() {
+      this.$listing.find('.active, .passed, .failed').removeClass('active passed failed');
     }
   });
 
