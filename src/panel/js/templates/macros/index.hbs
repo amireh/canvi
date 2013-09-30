@@ -1,19 +1,22 @@
 <table>
   <thead>
     <tr>
-      <th>Type</th>
-      <th>Target</th>
-      <th>URL</th>
+      <th>Name</th>
+      <th>Length</th>
     </tr>
   </thead>
-  <tbody id="macro_listing">
+  <tbody id="macros">
   </tbody>
 </table>
 
 <div class="toolbar">
-  <button class="custom-appearance icon-play" data-action="start"></button>
-  <button class="custom-appearance icon-pause" data-action="pause"></button>
-  <button class="custom-appearance icon-stop" data-action="stop"></button>
-  <button class="custom-appearance icon-trash" data-action="reset"></button>
-  <button class="custom-appearance icon-cmd" data-action="reload"></button>
+  <button data-action="new" class="custom-appearance icon-add" title="New macro"></button>
+  <button data-action="play" class="custom-appearance icon-play" title="Play macro"></button>
+  <button data-action="edit" class="custom-appearance icon-compose" title="Edit macro"></button>
+
+  <button data-action="reset" class="custom-appearance icon-trash icon-red" title="Remove all macros"></button>
+
+  <div class="pull-right">
+    <button class="custom-appearance icon-cmd" data-action="reload" title="Reload Canvi"></button>
+  </div>
 </div>

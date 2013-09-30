@@ -30,6 +30,7 @@ body {
   bottom: 0;
   left: 0;
   right: 0;
+  overflow: hidden;
   margin: @whitespace 0 0 0;
   border-top: 1px solid #ddd;
   background: #f4f4f4;
@@ -42,7 +43,7 @@ body {
     font-size: 16px;
     background-image: none;
     background-color: transparent;
-    color: @foreground;
+    // color: @foreground;
     text-shadow: 0 1px 0 white;
     margin: 0 -5px 0 0;
     &:hover {
@@ -156,4 +157,8 @@ td {
 
 tr:last-child td {
   border-bottom: 1px solid #ddd;
+}
+
+.pull-right {
+  float: right;
 }

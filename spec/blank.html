@@ -2,13 +2,32 @@
 <html>
   <head>
     <meta encoding="utf-8" />
+    <script src="../vendor/js/zepto-1.0.js"></script>
+
+    <style>
+      button {
+        -webkit-appearance: none;
+        background: #ddd;
+        padding: 5px 10px;
+        border: 1px solid #aaa;
+        border-radius: 4px;
+      }
+      button.selected {
+        background: orange;
+      }
+    </style>
   </head>
   <body>
-    <button id="buttonTester">Push me</button>
+    <button id="buttonTester">Button one</button>
+    <button>Button two</button>
+    <button>Button three</button>
+    <button>Button four</button>
 
     <script>
-    console.warn('[script] installing my local handlers');
-    setTimeout(function() {
+      console.warn('[script] installing my local handlers');
+
+      // $('button').on('click', function() {
+      // });
 
       document.getElementById('buttonTester').addEventListener('click', function(e) {
         e.preventDefault();
@@ -21,6 +40,9 @@
       });
 
       document.addEventListener('click', function(e) {
+        $('.selected').removeClass('selected');
+        $(e.target).addClass('selected');
+
         console.log('some click event');
         e.preventDefault();
         e.stopPropagation();
@@ -28,11 +50,6 @@
         e.stopImmediatePropagation();
         return false;
       }, true);
-
-    }, 1);
-    setTimeout(function() {
-      // Canvi.MacroManager.start();
-    }, 2500);
-  </script>
+    </script>
   </body>
 </html>

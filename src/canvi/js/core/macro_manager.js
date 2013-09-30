@@ -17,53 +17,85 @@ define('core/macro_manager', [ 'lodash', 'backbone', 'models/macro' ], function(
     ],
 
     initialize: function() {
-      this.listenTo(Canvi.Messenger, 'macros:start', this.start);
-      this.listenTo(Canvi.Messenger, 'macros:pause', this.pause);
-      this.listenTo(Canvi.Messenger, 'macros:stop', this.stop);
-      this.listenTo(Canvi.Messenger, 'macros:reset', this.reset);
-
+      // Intercept events!
+      //
       // This must be done at this phase so we install our handlers before
       // any of the client code starts doing funky things.
       _.each(this.events, function(event) {
         document.addEventListener(event, _.bind(this.passToMacro, this, event), true /* capture phase */);
       }, this);
 
-      this.on('add change remove', function() {
-        Canvi.Storage.set('macros', this.toJSON());
-        console.debug('updated macro set in storage');
-      }, this);
+      // Pull from storage
+      this.set(this.fromCache());
 
-      // Update from storage
-      this.set(Canvi.Storage.get('macros') || []);
-      console.debug('MM from storage:', Canvi.Storage.get('macros'));
+      // Persist macro updates
+      this.on('add change remove', this.updateCache, this);
 
+      // Pick up where we left off if we're coming from a reload:
       var activeMacros = this.where({ status: 'active' });
-      console.debug(activeMacros.length, 'active macros:', activeMacros);
 
       if (activeMacros.length) {
-        this.current = activeMacros[0];
-        this.resume();
+        // this.current = activeMacros[0];
+        // this.resume();
+        this.start({
+          id: activeMacros[0].id
+        })
       }
+
+      // Listen to Panel messages
+      Canvi.Messenger.bindToNamespace('macros', this);
     },
 
-    start: function() {
+    /**
+     * Start recording a macro.
+     */
+    start: function(message) {
       if (this.current) {
         this.current.stop();
       }
 
       console.log('recording a new macro.');
 
-      this.current = this.add({}).last();
+      if (message.id) {
+        this.current = this.get(message.id);
+
+        if (!this.current) {
+          Canvi.Messenger.toPanel('errors', 'noSuchMacro');
+          return false;
+        }
+      }
+      else {
+        this.current = this.add({}).last();
+      }
+
       this.current.start();
+
+      // Listen to the macro entry additions so we can tell the Panel to update
+      this.listenTo(this.current.entries, 'add', function(entry) {
+        Canvi.Messenger.toPanel('macros', 'entry', entry.toJSON());
+      });
+
+      Canvi.Messenger.toPanel('macros', 'recordingStarted', this.current.toJSON());
     },
 
+    /**
+     * Pause the recording, but don't deactivate the macro.
+     */
     pause: function() {
       if (this.current) {
         console.debug('pausing macro');
+
+        this.stopListening(this.current.entries);
+
         this.current.pause();
+
+        Canvi.Messenger.toPanel('macros', 'recordingPaused');
       }
     },
 
+    /**
+     * Resume recording.
+     */
     resume: function() {
       if (this.current) {
         console.debug('resuming macro with', this.current.entries.length, 'entries');
@@ -71,14 +103,25 @@ define('core/macro_manager', [ 'lodash', 'backbone', 'models/macro' ], function(
       }
     },
 
+    /**
+     * Stop recording, deactivate the macro. Recording can be started again later.
+     */
     stop: function() {
       if (this.current) {
         console.log('stopping macro');
+
+        this.stopListening(this.current.entries);
+
         this.current.stop();
         this.current = null;
+
+        Canvi.Messenger.toPanel('macros', 'recordingStopped');
       }
     },
 
+    /**
+     * Purge the entire macro-set.
+     */
     reset: function() {
       this.stop();
 
@@ -86,6 +129,28 @@ define('core/macro_manager', [ 'lodash', 'backbone', 'models/macro' ], function(
       Canvi.Storage.remove('macros');
 
       console.debug('all macros have been removed.');
+
+      Canvi.Messenger.toPanel('macros', 'reset');
+    },
+
+    /**
+     * Discard the current macro.
+     */
+    remove: function() {
+      if (this.current) {
+        this.current.stop();
+        Backbone.Collection.prototype.remove.apply(this, [ this.current ]);
+        this.current = null;
+
+        Canvi.Messenger.toPanel('macros', 'removed');
+      }
+    },
+
+    /**
+     * List all macros.
+     */
+    list: function() {
+      Canvi.Messenger.toPanel('macros', 'list', this.toJSON());
     },
 
     /**
@@ -102,6 +167,14 @@ define('core/macro_manager', [ 'lodash', 'backbone', 'models/macro' ], function(
           this.current[evtName](event);
         }
       }
+    },
+
+    fromCache: function() {
+      return Canvi.Storage.get('macros');
+    },
+
+    updateCache: function() {
+      Canvi.Storage.set('macros', this.toJSON());
     }
   });
 });

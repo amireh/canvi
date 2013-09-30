@@ -8,7 +8,8 @@ define('core/messenger', [ 'backbone' ], function(Backbone) {
       panelPort: null
     },
 
-    requiredFields: [ 'category', 'label' ],
+    requiredFields: [ 'namespace', 'label' ],
+    handlers: {},
 
     connect: function() {
       this.set({
@@ -60,32 +61,50 @@ define('core/messenger', [ 'backbone' ], function(Backbone) {
 
       if (valid) {
         console.debug('[Canvi] got from panel:', message);
-        this.trigger([ message.category, message.label ].join(':'), message.data);
+        this.trigger([ message.namespace, message.label ].join(':'), message.data);
+
+        // Invoke namespace handlers
+        if (this.handlers[message.namespace]) {
+          console.info('invoking', this.handlers[message.namespace].length, 'namespace handlers for:', message.namespace)
+          _.invoke(this.handlers[message.namespace], message.label, message.data);
+        }
       }
     },
 
     /**
      * Dispatch a request or a response to the Panel.
      *
-     * @param {String} category
-     * The message category that the Panel handlers subscribe to.
+     * @param {String} namespace
+     * The message namespace that the Panel handlers subscribe to.
      *
      * @param  {Object} [payload={}]
      * Any data to be attached to the message.
      */
-    toPanel: function(category, label, payload) {
+    toPanel: function(namespace, label, payload) {
       chrome.extension.sendMessage({
         from: 'canvi',
-        category: category,
+        namespace: namespace,
         label: label,
         data: payload
       });
-      // window.postMessage({
-      //   from: 'canvi',
-      //   category: category,
-      //   label: label,
-      //   data: payload
-      // }, '*');
+    },
+
+    /**
+     * Subscribe to all messages published to the given namespace. The subscriber
+     * is expected to define handlers that are named "onMessage" where Message
+     * is substituted with the message label. Eg, 'macros:start' => onStart.
+     *
+     * @param  {String} namespace The message namespace.
+     * @param  {Object} object The subscriber.
+     */
+    bindToNamespace: function(namespace, object) {
+      if (!this.handlers[namespace]) {
+        this.handlers[namespace] = [];
+      }
+
+      this.handlers[namespace].push(object);
+
+      console.debug('Object has subscribed to namespace:', namespace);
     }
   });
 });

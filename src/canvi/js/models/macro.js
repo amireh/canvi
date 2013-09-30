@@ -20,22 +20,16 @@ define('models/macro', [
     initialize: function() {
       this.entries = new MacroEntrySet(null);
       this.listenTo(this.entries, 'add', this.announceEntry);
+
+      this.ensureId();
     },
 
     start: function() {
       this.set('status', 'active');
-
-      Canvi.Messenger.toPanel('macros', 'recordingStarted', {
-        id: this.get('id')
-      });
     },
 
     pause: function() {
       this.set('status', 'paused');
-
-      Canvi.Messenger.toPanel('macros', 'recordingPaused', {
-        id: this.get('id')
-      });
     },
 
     resume: function() {
@@ -50,10 +44,6 @@ define('models/macro', [
      */
     stop: function() {
       this.set('status', 'stopped');
-
-      Canvi.Messenger.toPanel('macros', 'recordingStopped', {
-        id: this.get('id')
-      });
     },
 
     onClick: function(e) {
@@ -95,13 +85,16 @@ define('models/macro', [
 
     announceEntry: function(entry) {
       console.info('new macro entry:', entry);
-      Canvi.Messenger.toPanel('macros', 'entry', entry.toJSON());
     },
 
     parse: function(data) {
-      console.debug('macro parsed from:', data);
       this.entries = new MacroEntrySet(data.entries, { parse: true, remove: false });
       delete data.entries;
+
+      if (!data.id) {
+        data.id = 'macro_' + this.cid;
+      }
+
       return data;
     },
 
@@ -111,6 +104,14 @@ define('models/macro', [
       data.entries = this.entries.toJSON();
 
       return data;
+    },
+
+    ensureId: function() {
+      if (!this.get('id')) {
+        this.set({
+          id: 'macro_' + this.cid
+        });
+      }
     }
   });
 });

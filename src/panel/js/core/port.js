@@ -54,21 +54,21 @@
         window.location.reload(true);
       }
 
-      this.trigger([ message.category, message.label ].join(':'), message.data);
+      this.trigger([ message.namespace, message.label ].join(':'), message.data);
     },
 
     /**
      * Dispatch a request or a response to Canvi.
      *
-     * @param {String} category   The "category" of messages this message falls under.
+     * @param {String} namespace   The "namespace" of messages this message falls under.
      * @param {String} label      A label that describes this particular message.
      * @param {Object} [data={}]  Any specific message data.
      */
-    toCanvi: function(category, label, data) {
-      console.debug('to canvi:', [ category, label ].join(':'));
+    toCanvi: function(namespace, label, data) {
+      console.debug('to canvi:', [ namespace, label ].join(':'));
 
       this.get('chromePort').postMessage({
-        category: category,
+        namespace: namespace,
         label: label,
         data: data || {},
         from: 'panel'
@@ -78,4 +78,9 @@
 
   Panel.Port = new Port();
   Panel.Port.connect();
+
+  // Export a shortcut for backbone entities to whisper to Canvi:
+  Backbone.Collection.prototype.toCanvi =
+  Backbone.View.prototype.toCanvi =
+  Backbone.Model.prototype.toCanvi = _.bind(Panel.Port.toCanvi, Panel.Port);
 })();

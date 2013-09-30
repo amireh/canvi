@@ -3,7 +3,8 @@
 
   var Router = Backbone.Router.extend({
     routes: {
-      'macros': 'switchToMacros',
+      'macros': 'showMacros',
+      'macros/:id': 'showMacro',
       'insights': 'switchToInsights',
     },
 
@@ -40,8 +41,24 @@
       }
     },
 
-    switchToMacros: function() {
-      Panel.MacrosView.render();
+    showMacros: function() {
+      this.show(Panel.MacrosView);
+    },
+    showMacro: function(macroId) {
+      this.show(Panel.MacroView, macroId);
+    },
+
+    show: function(view) {
+      var params = _.flatten(arguments);
+
+      params.shift();
+
+      if (this.view) {
+        this.view.remove();
+      }
+
+      this.view = view;
+      this.view.render.apply(this.view, params);
     }
   });
 
