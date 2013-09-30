@@ -1,11 +1,17 @@
 [
   {
-    "name": "Canvi",
+    "name": "Canvi Extension",
     "groups": [
       {
-        "name": "Core",
+        "name": "Canvi",
         "classes": [
           "Canvi.*"
+        ]
+      },
+      {
+        "name": "Panel",
+        "classes": [
+          "Panel.*"
         ]
       }
     ]

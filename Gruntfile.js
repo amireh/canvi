@@ -152,7 +152,7 @@ module.exports = function(grunt) {
         dest: 'doc/api',
         options: {
           'title': 'Canvi Reference',
-          'categories': '.jsduck',
+          // 'categories': '.jsduck',
           'builtin-classes': false,
           'color': true,
           'warnings': [],
