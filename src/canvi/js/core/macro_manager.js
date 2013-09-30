@@ -149,6 +149,22 @@ define('core/macro_manager', [ 'lodash', 'backbone', 'models/macro' ], function(
     },
 
     /**
+     * Remove a Macro entry at the specified index.
+     * @param  {Number} entryIndex Entry index.
+     */
+    removeEntry: function(entryIndex) {
+      var entry = this.current.entries.at(entryIndex);
+
+      if (entry) {
+        this.current.entries.remove(entry);
+        this.updateCache();
+
+        Canvi.Messenger.toPanel('macros', 'entryRemoved', entryIndex);
+      }
+
+    },
+
+    /**
      * Macro playback.
      */
     play: function(options) {

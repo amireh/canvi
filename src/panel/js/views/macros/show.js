@@ -16,6 +16,7 @@
       'macros:entry': 'appendMacroEntry',
       'macros:recordingStarted': 'onRecordingStarted',
       'macros:recordingStopped': 'onRecordingStopped',
+      'macros:entryRemoved': 'onEntryRemoved',
       'macros:removed': 'goToIndex'
     },
 
@@ -24,6 +25,7 @@
       'click [data-action="pause"]': 'proxyPauseRecording',
       'click [data-action="stop"]': 'proxyStopRecording',
       'click [data-action="remove"]': 'proxyRemoveMacro',
+      'click [data-action="removeEntry"]': 'proxyRemoveEntry',
       'click [data-action="reload"]': 'reload',
     },
 
@@ -119,6 +121,17 @@
 
     goToIndex: function() {
       Panel.Router.showMacros();
+    },
+
+    proxyRemoveEntry: function(e) {
+      var $entry = $(e.target).closest('.macro-entry');
+
+      if ($entry && $entry.length) {
+        Panel.Port.toCanvi('macros', 'removeEntry', $entry.index());
+      }
+    },
+    onEntryRemoved: function(entryIndex) {
+      this.$listing.find('.macro-entry:nth-child(' + (entryIndex+1) + ')').remove();
     }
   });
 

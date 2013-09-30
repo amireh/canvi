@@ -70,7 +70,7 @@
       this.get('chromePort').postMessage({
         namespace: namespace,
         label: label,
-        data: data || {},
+        data: data,
         from: 'panel'
       });
     }

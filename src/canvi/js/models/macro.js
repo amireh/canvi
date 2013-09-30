@@ -52,15 +52,49 @@ define('models/macro', [
     /**
      * @private
      */
-    identify: function(el) {
-      var fragments = [ el.nodeName.toLowerCase() ];
+    locate: function(node) {
+      var fragments = [ ];
+      var scope;
 
-      if (el.id) {
+      if (node.id) {
+        fragments.push('#' + node.id);
+      }
+      else {
+        if ( scope = this.locateScope(node) ) {
+          fragments.push('#' + scope);
+        }
 
-        fragments.push('#' + el.id);
+        // A position constraint
+        fragments.push([
+          node.nodeName.toLowerCase(),
+          'nth-child(' + this.nodeIndex(node) + ')'
+        ].join(':'));
       }
 
-      return fragments.join('');
+      return fragments.join(' ');
+    },
+
+    /**
+     * Find the nearest parent of a node with an ID.
+     */
+    locateScope: function(node) {
+      var scope;
+      var currentNode = node;
+
+      while (!scope && (currentNode = currentNode.parentNode)) {
+        if (currentNode.id) {
+          scope = currentNode;
+        }
+      }
+
+      return scope;
+    },
+
+    /**
+     * Find a node's index relative to its siblings.
+     */
+    nodeIndex: function(node) {
+      return $(node).index();
     },
 
     /**
@@ -69,7 +103,7 @@ define('models/macro', [
     addEntry: function(event, element, url) {
       var entry = {
         type: event,
-        target: this.identify(element),
+        target: this.locate(element),
         url: url
       };
 
