@@ -3,39 +3,16 @@ define('core/messenger', [ 'backbone' ], function(Backbone) {
 
   return Backbone.Model.extend({
     defaults: {
-      channel: null,
-      proxyPort: null,
-      panelPort: null
+      port: null
     },
 
     requiredFields: [ 'namespace', 'label' ],
     handlers: {},
 
     connect: function() {
-      this.set({
-        channel: new MessageChannel(),
-      });
-
-      this.set({
-        panelPort: this.get('channel').port1,
-        proxyPort: this.get('channel').port2
-      });
-
-      // Ping the content-script so it can open a port to the panel.
-      // window.postMessage('register-canvi', [ this.get('proxyPort') ], '*');
-
-      // Accept messages from the Panel.
-      // this.get('panelPort').addEventListener('message', _.bind(this.broadcast, this));
-      // this.get('panelPort').start();
-
-      // console.log(this.get('channel'));
       chrome.extension.onMessage.addListener(_.bind(this.broadcast, this));
 
-      this.get('panelPort').start();
-
-      var port = chrome.runtime.connect();
-      console.log(chrome.extension);
-      console.debug('port open');
+      this.set('port', chrome.runtime.connect());
     },
 
     /**
@@ -65,7 +42,6 @@ define('core/messenger', [ 'backbone' ], function(Backbone) {
 
         // Invoke namespace handlers
         if (this.handlers[message.namespace]) {
-          console.info('invoking', this.handlers[message.namespace].length, 'namespace handlers for:', message.namespace)
           _.invoke(this.handlers[message.namespace], message.label, message.data);
         }
       }

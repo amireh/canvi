@@ -29,4 +29,4 @@ requirejs.config({
 
 window.Canvi = {};
 
-require([ 'text', 'jquery', 'ext/backbone', 'ext/string', 'app' ], function() {});
+require([ 'text', 'jquery', 'ext/string', 'app' ], function() {});

@@ -45,8 +45,6 @@ define('models/macro', [
     },
 
     onClick: function(e) {
-      var $target = $(e.target);
-
       console.debug('[Canvi] something was clicked');
       this.addEntry('click', e.target, window.location.href);
     },

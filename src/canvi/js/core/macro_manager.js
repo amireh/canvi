@@ -38,7 +38,7 @@ define('core/macro_manager', [ 'lodash', 'backbone', 'models/macro' ], function(
       if (activeMacros.length) {
         this.start({
           id: activeMacros[0].id
-        })
+        });
       }
 
       // Listen to Panel messages

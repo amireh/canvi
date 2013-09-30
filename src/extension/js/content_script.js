@@ -35,7 +35,7 @@
 
     console.log('listening to port messages');
     port.start();
-  };
+  }
 
   console.log('[Canvi] content-script injected.');
 })();

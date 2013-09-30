@@ -100,7 +100,7 @@
 
       _.each(macro.entries, function(entry) {
         this.appendMacroEntry(entry);
-      }, this)
+      }, this);
     },
 
     onRecordingStopped: function() {

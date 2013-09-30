@@ -10,7 +10,7 @@
   var lastUrl = Panel.Storage.get('lastUrl');
 
   if (lastUrl) {
-    console.debug('Re-visiting URL from last session:', lastUrl)
+    console.debug('Re-visiting URL from last session:', lastUrl);
     Panel.Router.navigate(lastUrl);
   }
 })();
