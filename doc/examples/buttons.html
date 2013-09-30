@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta encoding="utf-8" />
+    <link rel="stylesheet" href="/examples/disco_droid.css" />
+
+    <script src="/vendor/js/zepto-1.0.js"></script>
+    <script src="/vendor/js/lodash.custom.min.js"></script>
+
+    <title>Buttons Example - Canvi</title>
+
+    <style>
+      body {
+        text-align: center;
+        font-family:Arial, Helvetica, sans-serif;
+      }
+      #buttons {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        margin-top: -24px;
+        margin-left: -138px;
+      }
+      button {
+        -webkit-appearance: none;
+        background-image: -webkit-gradient(linear,left top,left bottom,from(#4d90fe),to(#4787ed));
+        padding: 5px 10px;
+        border: 1px solid #3079ed;
+        border-radius: 50%;
+        line-height: 48px;
+        width: 64px;
+        text-shadow: 0 1px rgba(0,0,0,0.1);
+        color: white;
+        font-weight: bold;
+      }
+
+      button.selected {
+        background: -webkit-linear-gradient(top,  #d64937 0%,#d14836 100%);
+        border-color: rgb(153, 153, 153);
+      }
+    </style>
+  </head>
+  <body>
+
+    <div id="buttons">
+      <button id="firstButton">One</button>
+      <button>Two</button>
+      <button>Three</button>
+      <button>Four</button>
+    </div>
+
+    <div id="disco_droid">
+      <div class="right light"></div>
+      <div class="left light"></div>
+      <div class="droid">
+        <div class="head">
+          <div class="ears">
+            <div class="right ear"></div>
+            <div class="left ear"></div>
+          </div>
+          <div class="eyes">
+            <div class="right eye"></div>
+            <div class="left eye"></div>
+          </div>
+        </div>
+        <div class="body">
+          <div class="right arm"></div>
+          <div class="left arm"></div>
+          <div class="trunk">
+          </div>
+        </div>
+        <div class="foot">
+          <div class="right leg"></div>
+          <div class="left leg"></div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      console.warn('[script] installing my local handlers');
+
+      var correct = [
+        'one', 'four',  'bg',
+        'one', 'three', 'bg',
+        'one', 'two',   'bg',
+        'one', 'one',   'bg'
+      ];
+      var sequence = [];
+
+
+      document.getElementById('firstButton').addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        e.cancel = e.cancelBubble = true;
+        e.stopImmediatePropagation();
+
+        return false;
+      });
+
+      document.addEventListener('click', function(e) {
+        var $target = $(e.target);
+        var $droid = $('#disco_droid');
+        var highlight = true;
+
+        if ($target.hasClass('selected')) {
+          highlight = false;
+        }
+
+        $('.selected').removeClass('selected');
+
+        if (highlight) {
+          $(e.target).addClass('selected');
+        }
+
+        console.log('some click event handler');
+
+        $droid.hide();
+
+        if ($target[0].nodeName === 'BUTTON') {
+          sequence.push($target.text().toLowerCase());
+        } else {
+          sequence.push('bg');
+        }
+
+        if (_.isEqual(correct, sequence)) {
+          $droid.show();
+          sequence = [];
+        }
+        else if (!_.isEqual( correct.slice(0, sequence.length), sequence ) ) {
+          console.log('oops, wrong sequence:', sequence, correct.slice(0, sequence.length));
+          sequence = [];
+        }
+        else {
+          console.log('got', sequence.length, 'parts right out of', correct.length);
+        }
+
+        e.preventDefault();
+        e.stopPropagation();
+        e.cancel = e.cancelBubble = true;
+        e.stopImmediatePropagation();
+        return false;
+      }, true);
+
+    </script>
+  </body>
+</html>

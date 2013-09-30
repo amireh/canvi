@@ -22,6 +22,7 @@ define('core/messenger', [ 'backbone' ], function(Backbone) {
     broadcast: function(event) {
       var message = event;
       var valid = true;
+      var nsHandlers;
 
       if (message.from !== 'panel') {
         console.warn('[Canvi] Ignoring potentially untrusted message:', event);
@@ -40,9 +41,13 @@ define('core/messenger', [ 'backbone' ], function(Backbone) {
         console.debug('[Canvi] got from panel:', message);
         this.trigger([ message.namespace, message.label ].join(':'), message.data);
 
+        nsHandlers = this.handlers[message.namespace];
+
         // Invoke namespace handlers
-        if (this.handlers[message.namespace]) {
-          _.invoke(this.handlers[message.namespace], message.label, message.data);
+        if (nsHandlers && nsHandlers.length) {
+          _.each(nsHandlers, function(handler) {
+            handler[message.label](message.data);
+          });
         }
       }
     },

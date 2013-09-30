@@ -6,6 +6,7 @@
         "build",
         "node_modules",
         "doc/api",
+        "doc/vendor",
         ".git",
         ".grunt"
       ],

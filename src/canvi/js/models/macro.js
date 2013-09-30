@@ -141,15 +141,21 @@ define('models/macro', [
         fragments.push('#' + node.id);
       }
       else {
-        if ( scope = this.locateScope(node) ) {
+        // Any identifiable enclosing scope?
+        scope = this.locateScope(node);
+
+        if (scope) {
           fragments.push('#' + scope);
         }
 
+        var nodeName = node.nodeName.toLowerCase();
+
         // A position constraint
-        fragments.push([
-          node.nodeName.toLowerCase(),
-          'nth-child(' + this.nodeIndex(node) + ')'
-        ].join(':'));
+        if (!_.contains( ['html', 'body' ], nodeName)) {
+          nodeName += ':nth-child(' + (this.nodeIndex(node) + 1) + ')';
+        }
+
+        fragments.push(nodeName);
       }
 
       return fragments.join(' ');
@@ -164,7 +170,7 @@ define('models/macro', [
 
       while (!scope && (currentNode = currentNode.parentNode)) {
         if (currentNode.id) {
-          scope = currentNode;
+          scope = currentNode.id;
         }
       }
 
@@ -189,16 +195,15 @@ define('models/macro', [
       };
 
       this.entries.add(entry);
-      this.trigger('change', this);
     },
 
     parse: function(data) {
-      console.log('macro raw data:', data);
+      // console.log('macro raw data:', data);
 
       if (data.entries) {
         this.ensureEntries();
-        console.debug('macro cached entries:', data.entries);
         this.entries.set(data.entries, { parse: true, remove: false });
+
         delete data.entries;
       }
 
@@ -228,6 +233,9 @@ define('models/macro', [
     ensureEntries: function() {
       if (!this.entries) {
         this.entries = new MacroEntrySet(null);
+        this.listenTo(this.entries, 'add change remove', function() {
+          this.trigger('change', this);
+        });
       }
     },
 

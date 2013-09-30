@@ -26,7 +26,7 @@ define('core/macro_manager', [ 'lodash', 'backbone', 'models/macro' ], function(
       }, this);
 
       // Pull from storage
-      console.log('macros: updating from cache:', this.fromCache());
+      // console.log('macros: updating from cache:', this.fromCache());
       this.set(this.fromCache(), { parse: true });
 
       // Persist macro updates
@@ -87,13 +87,13 @@ define('core/macro_manager', [ 'lodash', 'backbone', 'models/macro' ], function(
 
       console.log('recording a new macro.');
 
-      if (macro.id) {
-        if (!this.focus(macro)) {
-          return false;
-        }
+      // Start a new macro if none is focused.
+      if (!macro || !macro.id) {
+        macro = this.add({}).last();
       }
-      else {
-        this.current = this.add({}).last();
+
+      if (!this.focus(macro)) {
+        return false;
       }
 
       this.current.record();
@@ -142,6 +142,8 @@ define('core/macro_manager', [ 'lodash', 'backbone', 'models/macro' ], function(
 
         this.stopListening(this.current.entries);
         this.stopListening(this.current);
+
+        Canvi.Messenger.toPanel('macros', 'stopped');
 
         this.current = null;
       }

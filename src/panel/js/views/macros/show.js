@@ -14,6 +14,7 @@
 
     messages: {
       'macros:focused': 'onFocused',
+      'macros:stopped': 'onStopped',
       'macros:entry': 'appendMacroEntry',
       'macros:entryRemoved': 'onEntryRemoved',
       'macros:playingEntry': 'onPlayingEntry',
@@ -65,7 +66,12 @@
       $('#content').html( this.$el );
       $('#active_toolbar').html( this.$('.toolbar') );
 
-      Panel.Port.toCanvi('macros', 'focus', { id: macroId });
+      if (macroId) {
+        Panel.Port.toCanvi('macros', 'focus', { id: macroId });
+      }
+      else {
+        this.proxyRecord();
+      }
     },
 
     remove: function() {
@@ -123,6 +129,10 @@
       }
     },
 
+    onStopped: function() {
+      this.resetEntries();
+    },
+
     clearEntries: function() {
       this.$listing.empty();
     },
@@ -168,8 +178,11 @@
         break;
         case true:
           $entry.addClass('passed');
+          status = 'passed';
         break;
       }
+
+      $entry.find('.entry-status').html(status);
 
     },
 

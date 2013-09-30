@@ -6,6 +6,7 @@ assets/locales/*/*.json
 doc/api
 .sublime-project.sublime-workspace
 specs.html
+doc/screencast-script
 
 [build]
 

@@ -40,7 +40,7 @@ module.exports = function(grunt) {
     connect: {
       specs: {
         options: {
-          keepalive: true,
+          keepalive: false,
           port: 8000
         }
       },
@@ -240,7 +240,7 @@ module.exports = function(grunt) {
   });
 
 
-  grunt.registerTask('test', [ 'jshint', 'jasmine' ]);
+  grunt.registerTask('test', [ 'jshint', 'connect:specs', 'jasmine' ]);
   grunt.registerTask('build', [
     'test',
     'requirejs',

@@ -205,3 +205,18 @@ tr {
 .text-center {
   text-align: center;
 }
+
+.empty-indicator {
+  display: none !important;
+}
+
+table tbody:empty + tfoot {
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.025);
+  text-align: center;
+}
