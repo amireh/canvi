@@ -52,7 +52,11 @@ define('core/messenger', [ 'backbone' ], function(Backbone) {
         // Invoke namespace handlers
         if (nsHandlers && nsHandlers.length) {
           _.each(nsHandlers, function(handler) {
-            handler[message.label](message.data);
+            if (_.isFunction(handler[message.label])) {
+              handler[message.label](message.data);
+            } else {
+              console.error(message.label, 'is not understood by', handler);
+            }
           });
         }
       }
