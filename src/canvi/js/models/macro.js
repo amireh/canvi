@@ -2,8 +2,9 @@ define('models/macro', [
   'jquery',
   'lodash',
   'backbone',
-  'models/macro_entry'
-], function($, _, Backbone, MacroEntry) {
+  'models/macro_entry',
+  'core/util'
+], function($, _, Backbone, MacroEntry, Util) {
   'use strict';
 
   var MacroEntrySet = Backbone.Collection.extend({

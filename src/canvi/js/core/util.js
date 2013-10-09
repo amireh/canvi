@@ -1,4 +1,6 @@
 define('core/util', [ 'lodash' ], function(_) {
+  'use strict';
+
   var Util = {
     invoke: function(callback, thisArg) {
       if (_.isFunction(callback)) {
