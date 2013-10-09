@@ -255,6 +255,8 @@ define('core/macro_manager', [ 'lodash', 'backbone', 'models/macro' ], function(
      * @private
      */
     updateCache: function() {
+      console.debug('saving macros');
+
       Canvi.Storage.set('macros', this.toJSON());
     },
 
@@ -278,17 +280,15 @@ define('core/macro_manager', [ 'lodash', 'backbone', 'models/macro' ], function(
     replayIfApplicable: function(macro, status) {
       var that = this;
 
-      if (status !== 'idle') {
-        return;
-      }
-
-      if (this.playCursor < macro.get('repeat')) {
-        setTimeout(function() {
-          that.play();
-        }, macro.get('repeatEvery'));
-      }
-      else {
-        this.playCursor = 0;
+      if (status === 'idle' && macro.previous('status') === 'playing') {
+        if (this.playCursor < macro.get('repeat')) {
+          setTimeout(function() {
+            that.play();
+          }, macro.get('repeatEvery'));
+        }
+        else {
+          this.playCursor = 0;
+        }
       }
     },
 
