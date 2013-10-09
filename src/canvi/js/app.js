@@ -1,8 +1,9 @@
 define('app', [
   'store',
+  'core/util',
   'core/macro_manager',
   'core/messenger'
-], function(Store, MacroManager, Messenger) {
+], function(Store, Util, MacroManager, Messenger) {
   'use strict';
 
   console.log('[Canvi] hi!');
@@ -13,6 +14,7 @@ define('app', [
    * Canvi namespace.
    */
   window.Canvi = {};
+  window.Util = Util;
 
   /**
    * @property {store} Storage

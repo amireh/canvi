@@ -1,5 +1,6 @@
 @import (less) "../../../assets/fonts/Canvi-1.0/style.less";
 @import "webkit-widgets";
+@import "chrome-overlay";
 
 @whitespace: 10px;
 @foreground: #444;
@@ -49,7 +50,7 @@ body {
     vertical-align: middle;
   }
 
-  button[class*="icon"] {
+  [class*="icon"] {
     padding: @whitespace / 2 @whitespace;
     border: 1px solid #ccc;
     border-top: none;
@@ -219,4 +220,28 @@ table tbody:empty + tfoot {
   bottom: 0;
   background: rgba(0,0,0,0.025);
   text-align: center;
+}
+a.unstyled {
+  text-decoration: none;
+  color: @foreground;
+  display: inline-block;
+}
+
+.overlay {
+  -webkit-user-select: none;
+
+  label {
+    display: block;
+  }
+
+  hr {
+    background-color: #ddd;
+    border: 0;
+    height: 1px;
+    text-align: left;
+    width: 100%;
+  }
+  h4 {
+    margin: 5px 0;
+  }
 }

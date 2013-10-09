@@ -2927,6 +2927,26 @@
   }
 
   /**
+   * Defers executing the `func` function until the current call stack has cleared.
+   * Additional arguments will be passed to `func` when it is invoked.
+   *
+   * @static
+   * @memberOf _
+   * @category Functions
+   * @param {Function} func The function to defer.
+   * @param {Mixed} [arg1, arg2, ...] Arguments to invoke the function with.
+   * @returns {Number} Returns the timer id.
+   * @example
+   *
+   * _.defer(function() { alert('deferred'); });
+   * // returns from the function before `alert` is called
+   */
+  function defer(func) {
+    var args = nativeSlice.call(arguments, 1);
+    return setTimeout(function() { func.apply(undefined, args); }, 1);
+  }
+
+  /**
    * Creates a function that is restricted to execute `func` once. Repeat calls to
    * the function will return the value of the first call. The `func` is executed
    * with the `this` binding of the created function.
@@ -3212,6 +3232,7 @@
   lodash.chain = chain;
   lodash.countBy = countBy;
   lodash.defaults = defaults;
+  lodash.defer = defer;
   lodash.difference = difference;
   lodash.filter = filter;
   lodash.flatten = flatten;

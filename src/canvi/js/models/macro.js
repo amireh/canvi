@@ -29,9 +29,17 @@ define('models/macro', [
        *   2. recording
        *   3. playing
        *   4. paused
-       * @type {String}
        */
-      status: 'idle'
+      status: 'idle',
+
+      /**
+       * @cfg {Number} [repeat=1]
+       *
+       * The number of times the playback should be repeated.
+       */
+      repeat: 1,
+
+      repeatEvery: 1000
     },
 
     initialize: function() {
@@ -47,14 +55,15 @@ define('models/macro', [
     },
 
     /**
-     * Playback the macro.
+     * Playback the macro, and optionally re-playing based on Macro#repeat.
      */
     play: function(options, entry) {
       var that = this;
       var entryIndex;
 
       this.options = _.extend({}, this.options, {
-        pauseTimer: 500
+        pauseTimer: 500,
+        repeat: 1
       }, options);
 
       this.entry = entry || this.entries.first();
@@ -128,9 +137,13 @@ define('models/macro', [
     /**
      * Stop recording or playing.
      */
-    stop: function() {
+    stop: function(callback, thisArg) {
       this.set('status', 'idle');
       this.entry = null;
+
+      if (callback) {
+        Util.invoke(callback, thisArg, this);
+      }
     },
 
     onClick: function(e) {

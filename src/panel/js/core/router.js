@@ -56,6 +56,7 @@
     showMacros: function() {
       this.show(Panel.MacrosView);
     },
+
     showMacro: function(macroId) {
       this.show(Panel.MacroView, macroId);
     },

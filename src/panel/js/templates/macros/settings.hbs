@@ -1,0 +1,34 @@
+<div class="overlay">
+  <div class="page showing">
+    <div class="close-button"></div>
+
+    <h1>Macro Settings</h1>
+    <div class="content-area">
+      <form>
+        <label>
+          Name <input type="text" name="id" value="{{id}}" />
+        </label>
+
+        <div id="playback_settings">
+          <hr />
+          <h4>Playback settings</h4>
+
+          <label>
+            Repeat <input type="number" min="1" max="10" name="repeat" value="{{repeat}}" />
+          </label>
+        </div>
+      </form>
+    </div>
+    <div class="action-area">
+      <div class="action-area-link-container">
+        <button data-action="useDefaults" class="link-button">Use default settings</button>
+      </div>
+      <div class="button-strip">
+        <button data-action="close">Cancel</button>
+        <button data-action="save">Save</button>
+      </div>
+    </div>
+    <div class="form-actions">
+    </div>
+  </div>
+</div>

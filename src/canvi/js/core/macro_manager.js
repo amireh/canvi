@@ -11,6 +11,8 @@ define('core/macro_manager', [ 'lodash', 'backbone', 'models/macro' ], function(
     model: Macro,
     urlRoot: '/macros',
 
+    playCursor: 0,
+
     /**
      * @property {String[]} events
      * Events that will be intercepted by Macros and recorded regardless of
@@ -65,9 +67,8 @@ define('core/macro_manager', [ 'lodash', 'backbone', 'models/macro' ], function(
 
         if (this.current) {
           // Broadcast status updates
-          this.listenTo(this.current, 'change:status', function() {
-            Canvi.Messenger.toPanel('macros', 'statusUpdated', this.current.get('status'));
-          });
+          this.listenTo(this.current, 'change:status', this.broadcastStatus);
+          this.listenTo(this.current, 'change:status', this.replayIfApplicable);
 
           Canvi.Messenger.toPanel('macros', 'focused', this.current.toJSON());
 
@@ -211,6 +212,7 @@ define('core/macro_manager', [ 'lodash', 'backbone', 'models/macro' ], function(
         this.current.resume();
       }
       else if (!this.current.isPlaying()) {
+        ++this.playCursor;
         this.current.play(options);
       }
     },
@@ -238,12 +240,61 @@ define('core/macro_manager', [ 'lodash', 'backbone', 'models/macro' ], function(
       }
     },
 
+    /**
+     * Pull the cached version of the MM.
+     *
+     * @private
+     * @return {Object} The cached macro manager.
+     */
     fromCache: function() {
       return Canvi.Storage.get('macros');
     },
 
+    /**
+     * Save the MM to persistent storage.
+     * @private
+     */
     updateCache: function() {
       Canvi.Storage.set('macros', this.toJSON());
+    },
+
+    /**
+     * Notify the panel whenever the macro's status changes.
+     * @protected
+     *
+     * @param  {Macro} macro The current macro.
+     * @param  {String} status Its status.
+     */
+    broadcastStatus: function(macro, status) {
+      Canvi.Messenger.toPanel('macros', 'statusUpdated', status);
+    },
+
+    /**
+     * Check if we should re-play the macro once it's become idle based on Macro#repeat.
+     *
+     * @param  {Macro} macro The current macro.
+     * @param  {String} status Its status, must be 'idle'.
+     */
+    replayIfApplicable: function(macro, status) {
+      var that = this;
+
+      if (status !== 'idle') {
+        return;
+      }
+
+      if (this.playCursor < macro.get('repeat')) {
+        setTimeout(function() {
+          that.play();
+        }, macro.get('repeatEvery'));
+      }
+      else {
+        this.playCursor = 0;
+      }
+    },
+
+    configureMacro: function(options) {
+      this.current.set(options);
+      Canvi.Messenger.toPanel('macros', 'configured', this.current.toJSON());
     }
   });
 });

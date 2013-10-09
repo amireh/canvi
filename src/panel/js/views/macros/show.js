@@ -36,7 +36,8 @@
       'click [data-action="stop"]': 'proxyStop',
       'click [data-action="play"]': 'proxyPlay',
       'click [data-action="remove"]': 'proxyRemove',
-      'click [data-action="removeEntry"]': 'proxyRemoveEntry'
+      'click [data-action="removeEntry"]': 'proxyRemoveEntry',
+      'click [data-action="configure"]': 'showSettingsOverlay'
     },
 
     /**
@@ -64,6 +65,7 @@
       this.$pause = this.$('[data-action="pause"]');
       this.$stop  = this.$('[data-action="stop"]');
       this.$remove = this.$('[data-action="remove"]');
+      this.$configure = this.$('[data-action="configure"]');
       this.$controls = this.$('[data-action]');
 
       this.$listing = this.$('#entries');
@@ -80,6 +82,7 @@
     },
 
     remove: function() {
+      this.hideSettingsOverlay();
       this.proxyStop();
       this.macro = null;
 
@@ -96,7 +99,6 @@
 
     proxyPlay: function() {
       Panel.Port.toCanvi('macros', 'play');
-      this.resetEntries();
     },
 
     proxyPause: function() {
@@ -200,6 +202,8 @@
           this.$stop.enable();
         break;
         case 'playing':
+          this.resetEntries();
+
           this.$pause.enable();
           this.$stop.enable();
         break;
@@ -211,6 +215,7 @@
           this.$play.enable();
           this.$record.enable();
           this.$remove.enable();
+          this.$configure.enable();
         break;
       }
     },
@@ -221,6 +226,19 @@
 
     resetEntries: function() {
       this.$listing.find('.active, .passed, .failed').removeClass('active passed failed');
+    },
+
+    showSettingsOverlay: function() {
+      this.settingsOverlay = Panel.MacroSettingsView;
+      this.settingsOverlay.render(this.macro);
+    },
+
+    hideSettingsOverlay: function() {
+      if (this.settingsOverlay && this.settingsOverlay.$el) {
+        this.settingsOverlay.remove();
+      }
+
+      this.settingsOverlay = null;
     }
   });
 
