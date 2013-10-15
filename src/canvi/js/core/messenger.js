@@ -19,6 +19,10 @@ define('core/messenger', [ 'backbone' ], function(Backbone) {
       chrome.extension.onMessage.addListener(_.bind(this.broadcast, this));
 
       this.set('port', chrome.runtime.connect());
+
+      chrome.extension.sendMessage({
+        from: 'canvi'
+      });
     },
 
     /**
@@ -44,7 +48,7 @@ define('core/messenger', [ 'backbone' ], function(Backbone) {
       });
 
       if (valid) {
-        console.debug('[Canvi] got from panel:', message);
+        console.debug('[Canvi] got from panel xyz:', message);
         this.trigger([ message.namespace, message.label ].join(':'), message.data);
 
         nsHandlers = this.handlers[message.namespace];
@@ -52,12 +56,17 @@ define('core/messenger', [ 'backbone' ], function(Backbone) {
         // Invoke namespace handlers
         if (nsHandlers && nsHandlers.length) {
           _.each(nsHandlers, function(handler) {
+
+            console.debug('[Canvi] dispatching to handler:', handler);
+
             if (_.isFunction(handler[message.label])) {
               handler[message.label](message.data);
             } else {
               console.error(message.label, 'is not understood by', handler);
             }
           });
+        } else {
+          console.warn('message can not be routed:', message);
         }
       }
     },

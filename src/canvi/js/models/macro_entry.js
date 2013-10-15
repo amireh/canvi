@@ -23,26 +23,30 @@ define('models/macro_entry', [
     /**
      * Simulate the entry, as if the user has done the event.
      */
-    simulate: function(options, callback) {
+    simulate: function(callback, thisArg) {
       var handlerId = [ 'simulate', this.get('type') ].join('-').camelize();
       var handler = this[ handlerId ];
 
       if (handler) {
-        this[handlerId](options, callback);
+        this[handlerId](callback, thisArg);
       }
     },
 
-    simulateClick: function(options, callback) {
+    simulateClick: function(callback, thisArg) {
       var $target = $( this.get('target') );
 
       if (!$target.length) {
         console.error('target not found:', this.get('target'));
-        return callback(this, 'not_found');
+        return Util.invoke(callback, thisArg, this, 'not_found');
       }
 
       $target.click();
 
-      callback(this, true);
+      Util.invoke(callback, thisArg, this, true);
+    },
+
+    getOption: function(key) {
+      return this.collection.macro.get(key);
     }
   });
 });

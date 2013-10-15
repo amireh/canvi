@@ -40,7 +40,19 @@ define('models/macro', [
        */
       repeat: 1,
 
-      repeatEvery: 1000
+      /**
+       * @cfg {Number} [repeatEvery=1000]
+       *
+       * Milliseconds to pause between replays.
+       */
+      repeatEvery: 1000,
+
+      /**
+       * @cfg {Number} pauseTimer
+       *
+       * Milliseconds to pause between entries during playback.
+       */
+      pauseTimer: 500
     },
 
     initialize: function() {
@@ -56,16 +68,11 @@ define('models/macro', [
     },
 
     /**
-     * Playback the macro, and optionally re-playing based on Macro#repeat.
+     * Playback the macro, and optionally replay based on Macro#repeat.
      */
-    play: function(options, entry) {
+    play: function(entry) {
       var that = this;
       var entryIndex;
-
-      this.options = _.extend({}, this.options, {
-        pauseTimer: 500,
-        repeat: 1
-      }, options);
 
       this.entry = entry || this.entries.first();
       entryIndex = this.entries.indexOf(this.entry);
@@ -80,15 +87,14 @@ define('models/macro', [
 
       Canvi.Messenger.toPanel('macros', 'playingEntry', entryIndex);
 
-      this.entry.simulate(options, function(entry, status) {
-
+      this.entry.simulate(function(entry, status) {
         Canvi.Messenger.toPanel('macros', 'entryPlayed', {
           entryIndex: entryIndex,
           status: status
         });
 
-        that.playNext();
-      });
+        this.playNext();
+      }, this);
     },
 
     /**
@@ -102,7 +108,6 @@ define('models/macro', [
       var that = this;
       var entryIndex = this.entries.indexOf(this.entry);
       var nextEntry = this.entries.at(entryIndex + 1);
-      var options = this.options;
 
       if (nextEntry) {
         setTimeout(function() {
@@ -110,8 +115,8 @@ define('models/macro', [
             return;
           }
 
-          that.play(options, nextEntry);
-        }, options.pauseTimer);
+          that.play(nextEntry);
+        }, this.get('pauseTimer'));
       } else {
         this.stop();
       }
@@ -148,7 +153,6 @@ define('models/macro', [
     },
 
     onClick: function(e) {
-      console.debug('[Canvi] something was clicked');
       this.addEntry('click', e.target, window.location.href);
     },
 
@@ -254,7 +258,7 @@ define('models/macro', [
 
     ensureEntries: function() {
       if (!this.entries) {
-        this.entries = new MacroEntrySet(null);
+        this.entries = new MacroEntrySet(null, { macro: this });
         this.listenTo(this.entries, 'add change remove', function() {
           this.trigger('change', this);
         });

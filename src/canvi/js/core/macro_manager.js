@@ -1,4 +1,9 @@
-define('core/macro_manager', [ 'lodash', 'backbone', 'models/macro' ], function(_, Backbone, Macro) {
+define('core/macro_manager', [
+  'lodash',
+  'backbone',
+  'models/macro',
+  'models/context'
+], function(_, Backbone, Macro, Context) {
   'use strict';
 
   /**
@@ -10,6 +15,7 @@ define('core/macro_manager', [ 'lodash', 'backbone', 'models/macro' ], function(
   return Backbone.Collection.extend({
     model: Macro,
     urlRoot: '/macros',
+    context: new Context({}, { key: 'mm' }),
 
     playCursor: 0,
 
@@ -34,26 +40,19 @@ define('core/macro_manager', [ 'lodash', 'backbone', 'models/macro' ], function(
       }, this);
 
       // Pull from storage
-      // console.log('macros: updating from cache:', this.fromCache());
       this.set(this.fromCache(), { parse: true });
+      this.context.fetch();
 
       // Persist macro updates
       this.on('add change remove', this.updateCache, this);
 
-      // Pick up where we left off if we're coming from a reload:
-      var activeMacros = this.where({ status: 'recording' });
-
-      if (activeMacros.length) {
-        this.record({
-          id: activeMacros[0].id
-        });
-      }
-
       // Listen to Panel messages
       Canvi.Messenger.bindToNamespace('macros', this);
+
+      this._resumeSession();
     },
 
-    focus: function(macro) {
+    focus: function(macro, callback, thisArg) {
       macro = macro || {};
 
       if (macro.id) {
@@ -66,11 +65,23 @@ define('core/macro_manager', [ 'lodash', 'backbone', 'models/macro' ], function(
         this.current = this.get(macro.id);
 
         if (this.current) {
+          // Track the focused macro so we can re-focus if the window reloads
+          this.context.save({
+            macro: {
+              id: this.current.get('id')
+            }
+          });
+
           // Broadcast status updates
           this.listenTo(this.current, 'change:status', this.broadcastStatus);
           this.listenTo(this.current, 'change:status', this.replayIfApplicable);
 
+          // Persist any changes
+          this.listenTo(this.current, 'change', this.updateCache);
+
           Canvi.Messenger.toPanel('macros', 'focused', this.current.toJSON());
+
+          Util.invoke(callback, thisArg, this);
 
           return true;
         }
@@ -143,7 +154,7 @@ define('core/macro_manager', [ 'lodash', 'backbone', 'models/macro' ], function(
      */
     stop: function() {
       if (this.current) {
-        console.log('stopping macro');
+        console.log('stopping macro', this.current.id);
 
         this.current.stop();
 
@@ -153,6 +164,7 @@ define('core/macro_manager', [ 'lodash', 'backbone', 'models/macro' ], function(
         Canvi.Messenger.toPanel('macros', 'stopped');
 
         this.current = null;
+        this.context.set({ macro: null }, { unset: true });
       }
     },
 
@@ -174,10 +186,12 @@ define('core/macro_manager', [ 'lodash', 'backbone', 'models/macro' ], function(
      * Discard the current macro.
      */
     remove: function() {
-      if (this.current) {
-        this.current.stop();
-        Backbone.Collection.prototype.remove.apply(this, [ this.current ]);
-        this.current = null;
+      var macro = this.current;
+
+      if (macro) {
+        this.stop();
+
+        Backbone.Collection.prototype.remove.apply(this, [ macro ]);
 
         Canvi.Messenger.toPanel('macros', 'removed');
       }
@@ -203,8 +217,12 @@ define('core/macro_manager', [ 'lodash', 'backbone', 'models/macro' ], function(
     /**
      * Macro playback.
      */
-    play: function(options) {
+    play: function() {
+      console.debug('playing...');
+
       if (!this.current) {
+        console.warn('can not play; a macro has not been focused.');
+
         return;
       }
 
@@ -213,7 +231,7 @@ define('core/macro_manager', [ 'lodash', 'backbone', 'models/macro' ], function(
       }
       else if (!this.current.isPlaying()) {
         ++this.playCursor;
-        this.current.play(options);
+        this.current.play();
       }
     },
 
@@ -260,6 +278,10 @@ define('core/macro_manager', [ 'lodash', 'backbone', 'models/macro' ], function(
       Canvi.Storage.set('macros', this.toJSON());
     },
 
+    purgeCache: function() {
+      Canvi.Storage.remove('macros');
+    },
+
     /**
      * Notify the panel whenever the macro's status changes.
      * @protected
@@ -272,7 +294,7 @@ define('core/macro_manager', [ 'lodash', 'backbone', 'models/macro' ], function(
     },
 
     /**
-     * Check if we should re-play the macro once it's become idle based on Macro#repeat.
+     * Check if we should replay the macro once it's become idle based on Macro#repeat.
      *
      * @param  {Macro} macro The current macro.
      * @param  {String} status Its status, must be 'idle'.
@@ -294,7 +316,38 @@ define('core/macro_manager', [ 'lodash', 'backbone', 'models/macro' ], function(
 
     configureMacro: function(options) {
       this.current.set(options);
+
       Canvi.Messenger.toPanel('macros', 'configured', this.current.toJSON());
+    },
+
+    /**
+     * @private
+     */
+    _resumeSession: function() {
+      var focused = this.context.get('macro');
+      var recording;
+      var playing;
+
+      if (focused) {
+        this.focus(focused);
+      }
+
+      // Pick up where we left off if we're coming from a reload:
+      recording = this.where({ status: 'recording' });
+      playing = this.where({ status: 'playing' });
+
+      if (recording.length) {
+        console.info('resuming recording');
+
+        this.record({
+          id: recording[0].id
+        });
+      }
+      else if (playing.length) {
+        console.info('resuming playback');
+
+        this.focus({ id: playing[0].id }, this.play, this);
+      }
     }
   });
 });
