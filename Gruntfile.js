@@ -53,7 +53,7 @@ module.exports = function(grunt) {
       }
     },
 
-    jasmine : {
+    jasmine: {
       src: [
         'src/canvi/js/main.js'
       ],
@@ -70,7 +70,6 @@ module.exports = function(grunt) {
 
         keepRunner: true,
         version: '1.3.1',
-        styles: 'dist/canvi.css',
         helpers: 'spec/helpers/**/*.js',
         specs : 'spec/{integration,unit}/**/*.js'
       }
