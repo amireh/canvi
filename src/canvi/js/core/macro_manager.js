@@ -2,8 +2,9 @@ define('core/macro_manager', [
   'lodash',
   'backbone',
   'models/macro',
-  'models/context'
-], function(_, Backbone, Macro, Context) {
+  'models/context',
+  'core/util'
+], function(_, Backbone, Macro, Context, Util) {
   'use strict';
 
   /**
@@ -347,7 +348,6 @@ define('core/macro_manager', [
       var focused = this.context.get('macro');
       var recording;
       var playing;
-      var that = this;
 
       if (focused) {
         console.debug('re-focusing');

@@ -1,7 +1,8 @@
 define('models/macro_entry', [
   'lodash',
   'backbone',
-], function(_, Backbone) {
+  'core/util'
+], function(_, Backbone, Util) {
   'use strict';
 
   /**

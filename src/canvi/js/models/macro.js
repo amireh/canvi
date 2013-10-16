@@ -77,7 +77,6 @@ define('models/macro', [
      * Playback the macro, and optionally replay based on Macro#replays.
      */
     play: function(entry) {
-      var that = this;
       var entryIndex;
 
       this.entry = entry || this.entries.at(this.get('cursor'));// this.entries.first();

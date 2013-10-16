@@ -1,7 +1,7 @@
 {
   "name": "Canvi",
   "description": "Task automation for Instructure Canvas development.",
-  "version": "0.3.4",
+  "version": "0.6.0",
   "homepage": "https://github.com/amireh/canvi",
   "private": true,
   "author": {

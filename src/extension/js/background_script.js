@@ -3,7 +3,6 @@
 
   var ports = {};
 
-
   // Messages coming in from the panel:
   chrome.extension.onConnect.addListener(function(port) {
     var tabId;
@@ -58,17 +57,17 @@
     Object.keys(ports).forEach(function(portId_) {
       ports[portId_].postMessage(msg);
     });
-  }
+  };
 
   window.notifyCanvi = function(idCanvi, message) {
     chrome.tabs.sendMessage(idCanvi, message);
-  }
+  };
 
   window.notifyCanvis = function(message) {
     Object.keys(ports).forEach(function(portId_) {
-      notifyCanvi(parseInt(portId_), message);
+      window.notifyCanvi(parseInt(portId_, 10), message);
     });
-  }
+  };
 
   window.ports = ports;
 
