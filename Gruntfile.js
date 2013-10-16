@@ -68,6 +68,7 @@ module.exports = function(grunt) {
           requireConfigFile: [ 'src/canvi/js/main.js', 'spec/config.js' ]
         },
 
+        styles: [ 'spec/specs.css' ],
         keepRunner: true,
         version: '1.3.1',
         helpers: 'spec/helpers/**/*.js',

@@ -10,6 +10,7 @@
     var panelId = port.portId_;
 
     if (port.name !== 'Canvi Panel') {
+      console.debug('got a message but not from panel', port);
       return;
     }
 
@@ -57,11 +58,19 @@
     Object.keys(ports).forEach(function(portId_) {
       ports[portId_].postMessage(msg);
     });
-  };
+  }
 
   window.notifyCanvi = function(idCanvi, message) {
     chrome.tabs.sendMessage(idCanvi, message);
-  };
+  }
+
+  window.notifyCanvis = function(message) {
+    Object.keys(ports).forEach(function(portId_) {
+      notifyCanvi(parseInt(portId_), message);
+    });
+  }
+
+  window.ports = ports;
 
   console.log('ready to establish links between canvi and panel instances');
 })();

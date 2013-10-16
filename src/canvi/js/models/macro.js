@@ -34,25 +34,31 @@ define('models/macro', [
       status: 'idle',
 
       /**
-       * @cfg {Number} [repeat=1]
+       * @cfg {Number} [replays=1]
        *
-       * The number of times the playback should be repeated.
+       * The number of times the playback should be replayed.
        */
-      repeat: 1,
+      replays: 1,
 
       /**
-       * @cfg {Number} [repeatEvery=1000]
+       * @cfg {Number} [replayTimer=1000]
        *
        * Milliseconds to pause between replays.
        */
-      repeatEvery: 1000,
+      replayTimer: 1000,
 
       /**
        * @cfg {Number} pauseTimer
        *
        * Milliseconds to pause between entries during playback.
        */
-      pauseTimer: 500
+      pauseTimer: 500,
+
+      /**
+       * @property {Number} cursor
+       * Index of the next playback entry.
+       */
+      cursor: 0
     },
 
     initialize: function() {
@@ -68,13 +74,13 @@ define('models/macro', [
     },
 
     /**
-     * Playback the macro, and optionally replay based on Macro#repeat.
+     * Playback the macro, and optionally replay based on Macro#replays.
      */
     play: function(entry) {
       var that = this;
       var entryIndex;
 
-      this.entry = entry || this.entries.first();
+      this.entry = entry || this.entries.at(this.get('cursor'));// this.entries.first();
       entryIndex = this.entries.indexOf(this.entry);
 
       if (!this.entry) {
@@ -110,6 +116,8 @@ define('models/macro', [
       var nextEntry = this.entries.at(entryIndex + 1);
 
       if (nextEntry) {
+        this.set({ cursor: entryIndex + 1 });
+
         setTimeout(function() {
           if (!that.isPlaying()) {
             return;
@@ -118,6 +126,7 @@ define('models/macro', [
           that.play(nextEntry);
         }, this.get('pauseTimer'));
       } else {
+        this.set({ cursor: 0 });
         this.stop();
       }
     },

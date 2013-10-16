@@ -15,9 +15,20 @@ define('core/macro_manager', [
   return Backbone.Collection.extend({
     model: Macro,
     urlRoot: '/macros',
-    context: new Context({}, { key: 'mm' }),
 
-    playCursor: 0,
+    context: new Context({
+      /**
+       * @property {Number} replayCursor
+       * The current playback repetition count.
+       */
+      // replayCursor: 0,
+
+      /**
+       * @property {Macro} current
+       * The currently focused macro.
+       */
+      macro: null
+    }, { key: 'mm' }),
 
     /**
      * @property {String[]} events
@@ -77,7 +88,7 @@ define('core/macro_manager', [
           this.listenTo(this.current, 'change:status', this.replayIfApplicable);
 
           // Persist any changes
-          this.listenTo(this.current, 'change', this.updateCache);
+          // this.listenTo(this.current, 'change', this.updateCache);
 
           Canvi.Messenger.toPanel('macros', 'focused', this.current.toJSON());
 
@@ -93,7 +104,7 @@ define('core/macro_manager', [
     },
 
     /**
-     * Start recording a macro.
+     * Start recording a new macro, or add to the focused one.
      *
      * @param {Macro} [macro=null]
      * Macro to focus. If none is specified, a new macro is created.
@@ -230,7 +241,6 @@ define('core/macro_manager', [
         this.current.resume();
       }
       else if (!this.current.isPlaying()) {
-        ++this.playCursor;
         this.current.play();
       }
     },
@@ -273,8 +283,6 @@ define('core/macro_manager', [
      * @private
      */
     updateCache: function() {
-      console.debug('saving macros');
-
       Canvi.Storage.set('macros', this.toJSON());
     },
 
@@ -294,23 +302,35 @@ define('core/macro_manager', [
     },
 
     /**
-     * Check if we should replay the macro once it's become idle based on Macro#repeat.
+     * Check if we should replay the macro once it's become idle based on Macro#replays.
      *
      * @param  {Macro} macro The current macro.
      * @param  {String} status Its status, must be 'idle'.
      */
     replayIfApplicable: function(macro, status) {
-      var that = this;
-
       if (status === 'idle' && macro.previous('status') === 'playing') {
-        if (this.playCursor < macro.get('repeat')) {
-          setTimeout(function() {
-            that.play();
-          }, macro.get('repeatEvery'));
-        }
-        else {
-          this.playCursor = 0;
-        }
+        this._replay(macro);
+      }
+    },
+
+    _replay: function(macro) {
+      var replaysLeft = macro.get('replays') - this.context.get('replayCursor');
+
+      if (replaysLeft > 0) {
+        this.context.increment('replayCursor');
+        this.context.set({ replaying: true });
+
+        setTimeout(_.bind(macro.play, macro), macro.get('replayTimer'));
+
+        this.broadcastStatus(null, [
+          'Replaying in ',
+           macro.get('replayTimer'),
+           ' milliseconds...',
+           ' (' + replaysLeft + ' replays left)'
+        ].join(''));
+      }
+      else {
+        this.context.set({ replayCursor: 0, replaying: false });
       }
     },
 
@@ -327,26 +347,31 @@ define('core/macro_manager', [
       var focused = this.context.get('macro');
       var recording;
       var playing;
+      var that = this;
 
       if (focused) {
+        console.debug('re-focusing');
         this.focus(focused);
       }
 
       // Pick up where we left off if we're coming from a reload:
-      recording = this.where({ status: 'recording' });
-      playing = this.where({ status: 'playing' });
+      recording = this.findWhere({ status: 'recording' });
+      playing = this.findWhere({ status: 'playing' });
 
-      if (recording.length) {
+      if (recording) {
         console.info('resuming recording');
 
         this.record({
-          id: recording[0].id
+          id: recording.id
         });
       }
-      else if (playing.length) {
+      else if (playing) {
         console.info('resuming playback');
 
-        this.focus({ id: playing[0].id }, this.play, this);
+        this.focus({ id: playing.id }, this.play, this);
+      }
+      else if (this.context.is('replaying') && this.current) {
+        this._replay(this.current);
       }
     }
   });

@@ -1,5 +1,21 @@
 describe('Macro Manager', function() {
   var mm = Canvi.MacroManager;
+  var oneClicked, twoClicked, threeClicked;
+  var $one, $two, $three;
+
+  var buttonFixture = function() {
+    oneClicked = twoClicked = threeClicked = 0;
+
+    $one = $('<button id="one" />').appendTo($fixture);
+    $two = $('<button id="two" />').appendTo($fixture);
+    $three = $('<button id="three" />').appendTo($fixture);
+
+    return function() {
+      $fixture.on('click', '#one',    function() { ++oneClicked; });
+      $fixture.on('click', '#two',    function() { ++twoClicked; });
+      $fixture.on('click', '#three',  function() { ++threeClicked; });
+    };
+  };
 
   describe('Recording', function() {
     it('should record a new macro', function() {
@@ -87,50 +103,157 @@ describe('Macro Manager', function() {
 
   describe('Playback', function() {
     it('should playback', function() {
-      $fixture.append('<button id="one" />');
-      $fixture.append('<button id="two" />');
-      $fixture.append('<button id="three" />');
+      var bindButtons = buttonFixture();
 
       toCanvi('macros', 'record', function() {
-        $fixture.find('#one').click();
-        $fixture.find('#three').click();
-        $fixture.find('#two').click();
+        $one.click();
+        $three.click();
+        $two.click();
+
+        bindButtons();
+
+        toCanvi('macros', 'configureMacro', {
+          pauseTimer: 500,
+          replays: 0
+        });
+
+        toCanvi('macros', 'play');
+
+        chrome.expectMessage('macros', 'entryPlayed', function(m) {
+          expect(m.data.status).toEqual(true);
+          expect(oneClicked).toEqual(1);
+        });
+
+        chrome.expectMessage('macros', 'entryPlayed', function(m) {
+          expect(m.data.status).toEqual(true);
+          expect(threeClicked).toEqual(1);
+        });
+
+        chrome.expectMessage('macros', 'entryPlayed', function(m) {
+          expect(m.data.status).toEqual(true);
+          expect(twoClicked).toEqual(1);
+        });
+      });
+    });
+
+    it('should replay', function() {
+      var bindButtons = buttonFixture();
+
+      toCanvi('macros', 'record', function() {
+        $one.click();
+        $three.click();
+        $two.click();
+
+        bindButtons();
+
+        toCanvi('macros', 'configureMacro', {
+          pauseTimer: 250,
+          replayTimer: 250,
+          replays: 1
+        });
+
+        toCanvi('macros', 'play');
+
+        chrome.expectMessage('macros', 'entryPlayed', function(m) {
+          expect(m.data.status).toEqual(true);
+          expect(oneClicked).toEqual(1);
+        });
+
+        chrome.expectMessage('macros', 'entryPlayed', function(m) {
+          expect(m.data.status).toEqual(true);
+          expect(threeClicked).toEqual(1);
+        });
+
+        chrome.expectMessage('macros', 'entryPlayed', function(m) {
+          expect(m.data.status).toEqual(true);
+          expect(twoClicked).toEqual(1);
+        });
+
+        chrome.expectMessage('macros', 'entryPlayed', function(m) {
+          expect(m.data.status).toEqual(true);
+          expect(oneClicked).toEqual(2);
+        });
+
+        chrome.expectMessage('macros', 'entryPlayed', function(m) {
+          expect(m.data.status).toEqual(true);
+          expect(threeClicked).toEqual(2);
+        });
+
+        chrome.expectMessage('macros', 'entryPlayed', function(m) {
+          expect(m.data.status).toEqual(true);
+          expect(twoClicked).toEqual(2);
+        });
+      });
+    });
+
+    it('should playback really quickly', function() {
+      var bindButtons = buttonFixture();
+
+      toCanvi('macros', 'record', function() {
+        $one.click();
+        $two.click();
+        $three.click();
+        $one.click();
+        $two.click();
+        $three.click();
+        $one.click();
+        $two.click();
+        $three.click();
+
+        bindButtons();
 
         toCanvi('macros', 'configureMacro', {
           pauseTimer: 0,
           replays: 0
         });
 
-        var oneClicked = 0, twoClicked = 0, threeClicked = 0;
+        toCanvi('macros', 'play');
 
-        $fixture.on('click', '#one', function() {
-          ++oneClicked;
+        chrome.expectMessage('macros', 'entryPlayed', function(m) {
+          expect(m.data.status).toEqual(true);
+          expect(oneClicked).toEqual(1);
         });
 
-        $fixture.on('click', '#two', function() {
-          ++twoClicked;
+        chrome.expectMessage('macros', 'entryPlayed', function(m) {
+          expect(m.data.status).toEqual(true);
+          expect(twoClicked).toEqual(1);
         });
 
-        $fixture.on('click', '#three', function() {
-          ++threeClicked;
+        chrome.expectMessage('macros', 'entryPlayed', function(m) {
+          expect(m.data.status).toEqual(true);
+          expect(threeClicked).toEqual(1);
         });
 
-        toCanvi('macros', 'play', function() {
-          chrome.expectMessage('macros', 'entryPlayed', function(m1) {
-            expect(m1.data.status).toEqual(true);
-            expect(oneClicked).toEqual(1);
-          });
-
-          chrome.expectMessage('macros', 'entryPlayed', function(m2) {
-            expect(m2.data.status).toEqual(true);
-            expect(threeClicked).toEqual(1);
-          });
-
-          chrome.expectMessage('macros', 'entryPlayed', function(m3) {
-            expect(m3.data.status).toEqual(true);
-            expect(twoClicked).toEqual(1);
-          });
+        chrome.expectMessage('macros', 'entryPlayed', function(m) {
+          expect(m.data.status).toEqual(true);
+          expect(oneClicked).toEqual(2);
         });
+
+        chrome.expectMessage('macros', 'entryPlayed', function(m) {
+          expect(m.data.status).toEqual(true);
+          expect(twoClicked).toEqual(2);
+        });
+
+        chrome.expectMessage('macros', 'entryPlayed', function(m) {
+          expect(m.data.status).toEqual(true);
+          expect(threeClicked).toEqual(2);
+        });
+
+        chrome.expectMessage('macros', 'entryPlayed', function(m) {
+          expect(m.data.status).toEqual(true);
+          expect(oneClicked).toEqual(3);
+        });
+
+        chrome.expectMessage('macros', 'entryPlayed', function(m) {
+          expect(m.data.status).toEqual(true);
+          expect(twoClicked).toEqual(3);
+        });
+
+        chrome.expectMessage('macros', 'entryPlayed', function(m) {
+          expect(m.data.status).toEqual(true);
+          expect(threeClicked).toEqual(3);
+        });
+
       });
     });
   });

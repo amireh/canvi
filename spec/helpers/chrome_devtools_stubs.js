@@ -16,7 +16,7 @@ root.chrome = {
      * Buffer the message.
      */
     sendMessage: function(message) {
-      console.debug('buffering message:', [ message.namespace, message.label ].join(':'));
+      console.debug('buffering message:', [ message.namespace, message.label ].join(':'), JSON.stringify(message.data));
       root.chrome.buffer.push(message);
     },
     onMessage: {
@@ -39,8 +39,18 @@ root.chrome.lastMessage = function() {
   return message;
 };
 
+/**
+ * Look-up a buffered message.
+ *
+ * @return {Object} The message.
+ */
+root.chrome.getMessage = function(ns, label) {
+  return _.find(root.chrome.buffer, { namespace: ns, label: label });
+};
+
 root.chrome.expectMessage = function(ns, label, callback) {
   runs(function() {
+    console.warn('buffer has', chrome.buffer.length, 'messages');
   });
 
   waitsFor(function() {
@@ -48,6 +58,10 @@ root.chrome.expectMessage = function(ns, label, callback) {
   }, 'Canvi to send ' + [ ns, label ].join(':'), 1000);
 
   runs(function() {
+    var index = root.chrome.buffer.indexOf(message);
+    root.chrome.buffer.splice(index, 1);
+
+    // root.chrome.flush();
     Util.invoke(callback, null, message);
   });
 };

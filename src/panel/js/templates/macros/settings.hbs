@@ -14,8 +14,17 @@
           <h4>Playback settings</h4>
 
           <label>
-            Repeat <input type="number" min="1" max="10" name="repeat" value="{{repeat}}" />
+            Number of playbacks <input type="number" min="0" max="100" name="replays" value="{{replays}}" />
           </label>
+
+          <label>
+            Pause between replays <input type="number" min="0" max="10000" name="replayTimer" value="{{replayTimer}}" />
+          </label>
+
+          <label>
+            Pause between playback entries <input type="number" min="0" max="10000" name="pauseTimer" value="{{pauseTimer}}" />
+          </label>
+
         </div>
       </form>
     </div>

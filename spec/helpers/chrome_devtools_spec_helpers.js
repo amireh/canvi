@@ -7,7 +7,12 @@ this.toCanvi = function(namespace, label, data, callback) {
     callback = data;
   }
 
+  var popMessage = _.isFunction(callback);
+  var bufferSz;
+
   runs(function() {
+    bufferSz = chrome.buffer.length;
+
     Canvi.Messenger.broadcast({
       from: 'panel',
       namespace: namespace,
@@ -17,7 +22,12 @@ this.toCanvi = function(namespace, label, data, callback) {
   });
 
   waitsFor(function() {
-    return message = chrome.lastMessage();
+    if (popMessage) {
+      return message = chrome.lastMessage();
+    }
+    else {
+      return chrome.buffer.length > bufferSz;
+    }
   }, 'Canvi to respond to #' + [ namespace, label ].join(':'), 1000);
 
   runs(function() {

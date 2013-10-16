@@ -3,6 +3,14 @@ var root = this;
 root.$fixture = null;
 
 beforeEach(function() {
-  $('#fixtures').remove();
-  root.$fixture = $('<div />').appendTo($('body'));
+  if (root.$fixture) {
+    root.$fixture.off();
+    root.$fixture.remove();
+  }
+
+  root.$fixture = $('<div id="fixture" />').appendTo($('body'));
+  root.$fixture.on('click', 'button', function(e) {
+    $(e.target).siblings().removeClass('selected');
+    $(e.target).addClass('selected');
+  });
 });

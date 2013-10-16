@@ -194,6 +194,8 @@
     },
 
     onStatusUpdated: function(status) {
+      console.debug('status updated:', status);
+
       this.$status.text( status );
       this.$controls.disable();
 

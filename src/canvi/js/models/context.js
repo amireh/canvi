@@ -37,6 +37,18 @@ define('models/context', [
       Store.set(this.key, this.toJSON());
     },
 
+    increment: function(prop) {
+      this.set(prop, (this.get(prop) || 0) + 1);
+    },
+
+    decrement: function(prop) {
+      this.set(prop, (this.get(prop) || 0) - 1);
+    },
+
+    is: function(prop) {
+      return !!this.get(prop);
+    },
+
     sync: function(method, model, options) {
       switch(method) {
         case 'read':
